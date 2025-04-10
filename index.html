@@ -1,79 +1,61 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>戰鬥場景原型 v0.1</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Battle</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      text-align: center;
-      padding: 20px;
-    }
-    .battlefield {
+      background-color: #222;
+      color: #fff;
       display: flex;
-      justify-content: space-around;
-      margin-bottom: 20px;
+      flex-direction: column;
+      align-items: center;
+    }
+    .field {
+      position: relative;
+      width: 800px;
+      height: 400px;
+      background: url('images/playground.png') no-repeat center center;
+      background-size: cover;
+      margin-top: 20px;
     }
     .zone {
-      width: 30%;
-      height: 200px;
-      border: 2px solid #444;
-      border-radius: 10px;
-      background-color: #ffffff;
-      position: relative;
-    }
-    .zone-label {
       position: absolute;
-      top: 5px;
-      left: 5px;
+      border: 2px dashed #fffa;
       font-weight: bold;
-    }
-    .character {
-      width: 50px;
-      height: 50px;
-      background-color: #4CAF50;
-      border-radius: 50%;
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 24px;
       color: white;
-      font-weight: bold;
-      font-size: 14px;
     }
-    .log-area {
-      width: 100%;
-      height: 150px;
-      background-color: #fff;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      overflow-y: auto;
-      padding: 10px;
-      text-align: left;
+    .zone.a { top: 50px; left: 350px; width: 100px; height: 100px; text-align: center; }
+    .zone.b { top: 150px; left: 100px; width: 100px; height: 100px; text-align: center; }
+    .zone.c { top: 150px; right: 100px; width: 100px; height: 100px; text-align: center; }
+
+    .controls {
+      margin-top: 20px;
+    }
+    .controls button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h2>戰鬥場景原型 v0.1</h2>
-  <div class="battlefield">
-    <div class="zone" id="zone-b">
-      <div class="zone-label">B區（白方遠攻區）</div>
-    </div>
-    <div class="zone" id="zone-a">
-      <div class="zone-label">A區（近戰區）</div>
-      <div class="character">(0/10)</div>
-    </div>
-    <div class="zone" id="zone-c">
-      <div class="zone-label">C區（黑方遠攻區）</div>
-    </div>
+  <h1>School Battle</h1>
+
+  <div class="field">
+    <div class="zone a">A</div>
+    <div class="zone b">B</div>
+    <div class="zone c">C</div>
   </div>
-  <div class="log-area">
-    <strong>戰鬥紀錄區：</strong><br>
-    <em>目前尚無操作紀錄</em>
+
+  <div class="controls">
+    <button>技能1</button>
+    <button>技能2</button>
+    <button>移動</button>
   </div>
 </body>
 </html>
