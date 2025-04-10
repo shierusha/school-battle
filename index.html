@@ -16,17 +16,6 @@
       background: url('images/playground.png') no-repeat center center;
       background-size: cover;
     }
-    .zone {
-      position: absolute;
-      border: 2px dashed rgba(255, 255, 255, 0.5);
-      font-size: 20px;
-      color: white;
-      padding: 5px;
-    }
-    .zone-a { top: 40%; left: 45%; }
-    .zone-b { top: 40%; left: 5%; }
-    .zone-c { top: 40%; right: 5%; }
-
     .character {
       position: absolute;
       text-align: center;
@@ -37,13 +26,9 @@
     }
     .hp {
       margin-top: 4px;
-      background: rgba(0,0,0,0.6);
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
       font-size: 14px;
     }
-
     .controls {
       position: absolute;
       bottom: 20px;
@@ -59,27 +44,22 @@
 </head>
 <body>
   <div class="field">
-    <!-- 區域標記 -->
-    <div class="zone zone-a">A 區（近戰區）</div>
-    <div class="zone zone-b">B 區（白方遠攻區）</div>
-    <div class="zone zone-c">C 區（黑方遠攻區）</div>
-
-    <!-- 白隊角色：01 在近戰區（A 區靠左） -->
+    <!-- 01 - 白隊近戰區（左側） -->
     <div class="character" style="top: 50%; left: 40%;">
-      <img src="students/01/icon/icon.png" alt="01" />
-      <div class="hp">01 (0/10)</div>
+      <img src="students/stu0001/icon/01-1.png" alt="01" />
+      <div class="hp">(0/10)</div>
     </div>
 
-    <!-- 白隊角色：34 在遠攻區（B 區左下角） -->
+    <!-- 34 - 白隊遠攻區（左下） -->
     <div class="character" style="top: 70%; left: 10%;">
-      <img src="students/34/icon/icon.png" alt="34" />
-      <div class="hp">34 (0/10)</div>
+      <img src="students/stu0034/icon/34-1.png" alt="34" />
+      <div class="hp">(0/10)</div>
     </div>
 
-    <!-- 黑隊角色：44 在近戰區（A 區靠右） -->
+    <!-- 44 - 黑隊近戰區（右側） -->
     <div class="character" style="top: 50%; right: 40%;">
-      <img src="students/44/icon/icon.png" alt="44" />
-      <div class="hp">44 (0/10)</div>
+      <img src="students/stu0044/icon/44-1.png" alt="44" />
+      <div class="hp">(0/10)</div>
     </div>
 
     <!-- 控制按鈕 -->
