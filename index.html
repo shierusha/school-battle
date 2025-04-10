@@ -1,65 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>School Battle</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
       font-family: sans-serif;
       background-color: #000;
     }
-    .playground {
+    .field {
       position: relative;
       width: 100vw;
       height: 100vh;
-      background-image: url("images/playground.png");
+      background: url('images/playground.png') no-repeat center center;
       background-size: cover;
-      background-position: center;
     }
-    .zone-label {
+    .zone {
       position: absolute;
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      font-size: 20px;
       color: white;
-      font-weight: bold;
-      font-size: 2rem;
+      padding: 5px;
     }
-    #zoneA { top: 10%; left: 45%; }
-    #zoneB { bottom: 10%; left: 10%; }
-    #zoneC { bottom: 10%; right: 10%; }
+    .zone-a { top: 40%; left: 45%; }
+    .zone-b { top: 40%; left: 5%; }
+    .zone-c { top: 40%; right: 5%; }
 
-    .button-panel {
+    .character {
+      position: absolute;
+      text-align: center;
+    }
+    .character img {
+      width: 80px;
+      image-rendering: pixelated;
+    }
+    .hp {
+      margin-top: 4px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .controls {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
     }
-    .action-button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
+    .controls button {
+      margin: 5px;
+      padding: 10px 16px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <div class="playground">
-    <!-- 區域標示 -->
-    <div id="zoneA" class="zone-label">A 區</div>
-    <div id="zoneB" class="zone-label">B 區</div>
-    <div id="zoneC" class="zone-label">C 區</div>
+  <div class="field">
+    <!-- 區域標記 -->
+    <div class="zone zone-a">A 區（近戰區）</div>
+    <div class="zone zone-b">B 區（白方遠攻區）</div>
+    <div class="zone zone-c">C 區（黑方遠攻區）</div>
+
+    <!-- 白隊角色：01 在近戰區（A 區靠左） -->
+    <div class="character" style="top: 50%; left: 40%;">
+      <img src="students/01/icon/icon.png" alt="01" />
+      <div class="hp">01 (0/10)</div>
+    </div>
+
+    <!-- 白隊角色：34 在遠攻區（B 區左下角） -->
+    <div class="character" style="top: 70%; left: 10%;">
+      <img src="students/34/icon/icon.png" alt="34" />
+      <div class="hp">34 (0/10)</div>
+    </div>
+
+    <!-- 黑隊角色：44 在近戰區（A 區靠右） -->
+    <div class="character" style="top: 50%; right: 40%;">
+      <img src="students/44/icon/icon.png" alt="44" />
+      <div class="hp">44 (0/10)</div>
+    </div>
 
     <!-- 控制按鈕 -->
-    <div class="button-panel">
-      <button class="action-button">技能 1</button>
-      <button class="action-button">技能 2</button>
-      <button class="action-button">移動</button>
+    <div class="controls">
+      <button onclick="alert('技能1 尚未啟用')">技能1</button>
+      <button onclick="alert('技能2 尚未啟用')">技能2</button>
+      <button onclick="alert('普通攻擊尚未啟用')">普通攻擊</button>
+      <button onclick="alert('移動尚未啟用')">移動</button>
     </div>
   </div>
 </body>
