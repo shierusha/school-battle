@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>戰鬥場景原型 v0.1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      text-align: center;
+      padding: 20px;
+    }
+    .battlefield {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .zone {
+      width: 30%;
+      height: 200px;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background-color: #ffffff;
+      position: relative;
+    }
+    .zone-label {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-weight: bold;
+    }
+    .character {
+      width: 50px;
+      height: 50px;
+      background-color: #4CAF50;
+      border-radius: 50%;
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .log-area {
+      width: 100%;
+      height: 150px;
+      background-color: #fff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h2>戰鬥場景原型 v0.1</h2>
+  <div class="battlefield">
+    <div class="zone" id="zone-b">
+      <div class="zone-label">B區（白方遠攻區）</div>
+    </div>
+    <div class="zone" id="zone-a">
+      <div class="zone-label">A區（近戰區）</div>
+      <div class="character">(0/10)</div>
+    </div>
+    <div class="zone" id="zone-c">
+      <div class="zone-label">C區（黑方遠攻區）</div>
+    </div>
+  </div>
+  <div class="log-area">
+    <strong>戰鬥紀錄區：</strong><br>
+    <em>目前尚無操作紀錄</em>
+  </div>
+</body>
+</html>
