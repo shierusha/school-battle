@@ -7,55 +7,60 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #222;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #000;
     }
-    .field {
+    .playground {
       position: relative;
-      width: 800px;
-      height: 400px;
-      background: url('images/playground.png') no-repeat center center;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("images/playground.png");
       background-size: cover;
-      margin-top: 20px;
+      background-position: center;
     }
-    .zone {
+    .zone-label {
       position: absolute;
-      border: 2px dashed #fffa;
-      font-weight: bold;
-      font-size: 24px;
       color: white;
+      font-weight: bold;
+      font-size: 2rem;
     }
-    .zone.a { top: 50px; left: 350px; width: 100px; height: 100px; text-align: center; }
-    .zone.b { top: 150px; left: 100px; width: 100px; height: 100px; text-align: center; }
-    .zone.c { top: 150px; right: 100px; width: 100px; height: 100px; text-align: center; }
+    #zoneA { top: 10%; left: 45%; }
+    #zoneB { bottom: 10%; left: 10%; }
+    #zoneC { bottom: 10%; right: 10%; }
 
-    .controls {
-      margin-top: 20px;
+    .button-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
     }
-    .controls button {
-      margin: 0 10px;
+    .action-button {
       padding: 10px 20px;
-      font-size: 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>School Battle</h1>
+  <div class="playground">
+    <!-- 區域標示 -->
+    <div id="zoneA" class="zone-label">A 區</div>
+    <div id="zoneB" class="zone-label">B 區</div>
+    <div id="zoneC" class="zone-label">C 區</div>
 
-  <div class="field">
-    <div class="zone a">A</div>
-    <div class="zone b">B</div>
-    <div class="zone c">C</div>
-  </div>
-
-  <div class="controls">
-    <button>技能1</button>
-    <button>技能2</button>
-    <button>移動</button>
+    <!-- 控制按鈕 -->
+    <div class="button-panel">
+      <button class="action-button">技能 1</button>
+      <button class="action-button">技能 2</button>
+      <button class="action-button">移動</button>
+    </div>
   </div>
 </body>
 </html>
