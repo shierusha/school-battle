@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>謝爾夏註冊登入</title>
+  <title>謝爾夏 註冊 / 登入</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
     body {
@@ -44,7 +44,7 @@
 
   <div class="section">
     <h3>註冊帳號</h3>
-    <input type="text" id="signup-username" placeholder="暱稱（遊戲內顯示名稱）">
+    <input type="text" id="signup-username" placeholder="暱稱（遊戲內名稱）">
     <input type="email" id="signup-email" placeholder="Email">
     <input type="password" id="signup-password" placeholder="Password">
     <button onclick="signUp()">註冊</button>
@@ -82,13 +82,17 @@
       } else {
         const user = data.user;
         if (user) {
-          await supabaseClient.from('players').insert({
+          const { error: insertError } = await supabaseClient.from('players').insert({
             player_id: user.id,
             username: username,
-            email: email,
-            role: 'player'
+            email: email
+            // role 欄位如果有預設 "player"，這裡可以省略不寫
           });
-          alert('註冊成功，請驗證信箱！');
+          if (insertError) {
+            alert('資料儲存失敗：' + insertError.message);
+          } else {
+            alert('註冊成功！請前往信箱驗證。');
+          }
         }
       }
     }
