@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>謝爾夏 註冊 / 登入</title>
+  <title>賴賴賴登錄/註冊</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
     body {
@@ -26,75 +26,59 @@
       color: white;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
     }
     .section {
       margin-bottom: 30px;
     }
-    .output {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border: 1px dashed #aaa;
-      border-radius: 4px;
-    }
   </style>
 </head>
 <body>
-  <h2>謝爾夏 登入／註冊 測試版</h2>
+  <h2>賴賴賴登錄/註冊</h2>
 
   <div class="section">
-    <h3>註冊帳號</h3>
-    <input type="text" id="signup-username" placeholder="暱稱（遊戲內名稱）">
+    <h3>註冊</h3>
+    <input type="text" id="signup-username" placeholder="玩家名稱">
     <input type="email" id="signup-email" placeholder="Email">
     <input type="password" id="signup-password" placeholder="Password">
     <button onclick="signUp()">註冊</button>
   </div>
 
   <div class="section">
-    <h3>登入帳號</h3>
+    <h3>登錄</h3>
     <input type="email" id="login-email" placeholder="Email">
     <input type="password" id="login-password" placeholder="Password">
-    <button onclick="signIn()">登入</button>
+    <button onclick="signIn()">登錄</button>
   </div>
 
-  <div class="output" id="output"></div>
-
   <script>
-    const { createClient } = supabase;
-    const supabaseClient = createClient(
-      'https://jtijaauoeqpyyoicpcor.supabase.co',
+    const supabase = window.supabase.createClient(
+      'https://jtjjaauoeqpyyoicpcor.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0'
     );
 
     async function signUp() {
-      const username = document.getElementById('signup-username').value;
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
-      const output = document.getElementById('output');
+      const username = document.getElementById('signup-username').value;
 
-      if (!username || !email || !password) {
-        return alert("請填寫所有欄位");
-      }
-
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
         alert('註冊失敗: ' + error.message);
       } else {
         const user = data.user;
-        if (user) {
-          const { error: insertError } = await supabaseClient.from('players').insert({
-            player_id: user.id,
-            username: username,
-            email: email
-          });
-          if (insertError) {
-            output.textContent = '資料儲存失敗：' + insertError.message;
-          } else {
-            output.textContent = '已模擬註冊成功：\nEmail: ' + email;
-            alert('註冊成功！請前往信箱驗證。');
-          }
+        alert('註冊成功，請驗證信箱！');
+
+        // 將使用者加入 players 表
+        const { error: insertError } = await supabase.from('players').insert({
+          player_id: user.id,
+          email: email,
+          username: username,
+          role: 'player'
+        });
+
+        if (insertError) {
+          alert('玩家資料儲存失敗: ' + insertError.message);
         }
       }
     }
@@ -102,13 +86,28 @@
     async function signIn() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
       if (error) {
         alert('登入失敗: ' + error.message);
       } else {
-        alert('登入成功！\n使用者 ID: ' + data.user.id);
-        localStorage.setItem('player_id', data.user.id);
-        window.location.href = "create.html";
+        const user = data.user;
+        alert('登入成功！\n用戶 ID: ' + user.id);
+        localStorage.setItem('player_id', user.id);
+
+        // 補寫入 players（若沒有）
+        const { error: upsertError } = await supabase.from('players').upsert({
+          player_id: user.id,
+          email: user.email,
+          role: 'player'
+        });
+
+        if (upsertError) {
+          alert('寫入玩家表失敗: ' + upsertError.message);
+        } else {
+          window.location.href = 'create.html'; // 成功後跳轉創角頁
+        }
       }
     }
   </script>
