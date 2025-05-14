@@ -5,31 +5,10 @@
   <title>謝爾夏登入頁</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 400px;
-      margin: 40px auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    input {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-    }
-    button {
-      padding: 10px;
-      width: 100%;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-    }
-    .section {
-      margin-bottom: 30px;
-    }
+    body { font-family: sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    input { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
+    button { padding: 10px; width: 100%; background-color: #4CAF50; color: white; border: none; border-radius: 4px; }
+    .section { margin-bottom: 30px; }
   </style>
 </head>
 <body>
@@ -50,7 +29,8 @@
   </div>
 
   <script>
-    const supabase = window.supabase.createClient(
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
       'https://jtjjaauoeqpyyoicpcor.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0amphdW9lcXB5eW9pY3Bjb3IiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNTY2NjExNCwiZXhwIjoxNzE4MjU4MTE0fQ.5NBfJDpdeXguQKj1u1QGmAo_4n39VntKOEj20dRm2AM'
     );
@@ -58,7 +38,7 @@
     async function signUp() {
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
       if (error) {
         alert('註冊失敗: ' + error.message);
       } else {
@@ -69,13 +49,13 @@
     async function signIn() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
         alert('登入失敗: ' + error.message);
       } else {
         alert('登入成功！\\n使用者 ID: ' + data.user.id);
         localStorage.setItem('player_id', data.user.id);
-        window.location.href = "create.html"; // 登入後跳轉創角頁
+        window.location.href = "create.html";
       }
     }
   </script>
