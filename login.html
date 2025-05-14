@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>謝爾夏登入頁</title>
+  <title>謝爾夏註冊登入</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -39,42 +40,70 @@
   </style>
 </head>
 <body>
-  <h2>謝爾夏 登入／註冊 測試版</h2>
+  <h2>謝爾夏 註冊 / 登入</h2>
 
   <div class="section">
     <h3>註冊帳號</h3>
+    <input type="text" id="signup-username" placeholder="暱稱（遊戲內顯示名稱）">
     <input type="email" id="signup-email" placeholder="Email">
     <input type="password" id="signup-password" placeholder="Password">
-    <button onclick="mockSignUp()">註冊</button>
+    <button onclick="signUp()">註冊</button>
   </div>
 
   <div class="section">
     <h3>登入帳號</h3>
     <input type="email" id="login-email" placeholder="Email">
     <input type="password" id="login-password" placeholder="Password">
-    <button onclick="mockSignIn()">登入</button>
+    <button onclick="signIn()">登入</button>
   </div>
 
   <div class="output" id="output"></div>
 
   <script>
-    function mockSignUp() {
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://jtijaauoeqpyyoicpcor.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0'
+    );
+
+    async function signUp() {
+      const username = document.getElementById('signup-username').value;
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
-      if (email && password) {
-        document.getElementById('output').innerText = `已模擬註冊成功：\nEmail: ${email}`;
+
+      if (!username || !email || !password) {
+        return alert("請填寫所有欄位");
+      }
+
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+      if (error) {
+        alert('註冊失敗: ' + error.message);
       } else {
-        document.getElementById('output').innerText = `請輸入註冊 Email 與密碼`;
+        const user = data.user;
+        if (user) {
+          await supabaseClient.from('players').insert({
+            player_id: user.id,
+            username: username,
+            email: email,
+            role: 'player'
+          });
+          alert('註冊成功，請驗證信箱！');
+        }
       }
     }
 
-    function mockSignIn() {
+    async function signIn() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      if (email && password) {
-        document.getElementById('output').innerText = `已模擬登入成功：\nEmail: ${email}`;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('登入失敗: ' + error.message);
       } else {
-        document.getElementById('output').innerText = `請輸入登入 Email 與密碼`;
+        alert('登入成功！\n使用者 ID: ' + data.user.id);
+        localStorage.setItem('player_id', data.user.id);
+        window.location.href = "create.html";
       }
     }
   </script>
