@@ -3,59 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <title>謝爾夏登入頁</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body { font-family: sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-    input { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
-    button { padding: 10px; width: 100%; background-color: #4CAF50; color: white; border: none; border-radius: 4px; }
-    .section { margin-bottom: 30px; }
+    body {
+      font-family: sans-serif;
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    input {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    button {
+      padding: 10px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .output {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px dashed #aaa;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
-  <h2>謝爾夏登入／註冊</h2>
+  <h2>謝爾夏 登入／註冊 測試版</h2>
 
   <div class="section">
     <h3>註冊帳號</h3>
     <input type="email" id="signup-email" placeholder="Email">
     <input type="password" id="signup-password" placeholder="Password">
-    <button onclick="signUp()">註冊</button>
+    <button onclick="mockSignUp()">註冊</button>
   </div>
 
   <div class="section">
     <h3>登入帳號</h3>
     <input type="email" id="login-email" placeholder="Email">
     <input type="password" id="login-password" placeholder="Password">
-    <button onclick="signIn()">登入</button>
+    <button onclick="mockSignIn()">登入</button>
   </div>
 
-  <script>
-    const { createClient } = supabase;
-    const supabaseClient = createClient(
-      'https://jtjjaauoeqpyyoicpcor.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0amphdW9lcXB5eW9pY3Bjb3IiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNTY2NjExNCwiZXhwIjoxNzE4MjU4MTE0fQ.5NBfJDpdeXguQKj1u1QGmAo_4n39VntKOEj20dRm2AM'
-    );
+  <div class="output" id="output"></div>
 
-    async function signUp() {
+  <script>
+    function mockSignUp() {
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) {
-        alert('註冊失敗: ' + error.message);
+      if (email && password) {
+        document.getElementById('output').innerText = `已模擬註冊成功：\nEmail: ${email}`;
       } else {
-        alert('註冊成功！請前往信箱驗證帳號。');
+        document.getElementById('output').innerText = `請輸入註冊 Email 與密碼`;
       }
     }
 
-    async function signIn() {
+    function mockSignIn() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('登入失敗: ' + error.message);
+      if (email && password) {
+        document.getElementById('output').innerText = `已模擬登入成功：\nEmail: ${email}`;
       } else {
-        alert('登入成功！\\n使用者 ID: ' + data.user.id);
-        localStorage.setItem('player_id', data.user.id);
-        window.location.href = "index.html";
+        document.getElementById('output').innerText = `請輸入登入 Email 與密碼`;
       }
     }
   </script>
