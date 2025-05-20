@@ -23,6 +23,7 @@
         </div>
         <button id="login-btn" type="button" onclick="signIn()">登入</button>
         <div class="switch-link" onclick="showSignUp()">我要註冊</div>
+        <div class="switch-link" onclick="showForgot()">忘記密碼？</div>
 
         <div class="msg" id="login-msg"></div>
       </form>
@@ -43,6 +44,16 @@
         <div class="switch-link" onclick="showLogin()">返回登入</div>
         <div class="msg" id="signup-msg"></div>
       </form>
+
+      <!-- 忘記密碼區塊（預設隱藏）-->
+<form id="forgot-form" style="display:none" onsubmit="handleForgot(event)">
+  <div class="form-title">重設密碼</div>
+  <label for="forgot-email">請輸入你的電子信箱</label>
+  <input type="email" id="forgot-email" placeholder="Email" required>
+  <button type="submit" id="forgot-btn">寄送重設信</button>
+  <div class="switch-link" onclick="showLogin()">返回登入</div>
+  <div class="msg" id="forgot-msg"></div>
+</form>
     </div>
   </div>
   <script src="login.js"></script>
