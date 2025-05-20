@@ -138,7 +138,9 @@ button:hover, button:active, button:focus {
 
 </style>
 <body>
-  <div class="center">
+ <div class="center">
+  <!-- 登入/註冊頁面（共用一區） -->
+  <div id="login-section">
     <h2>謝爾夏</h2>
     <form id="login-form">
       <div class="form-title">登入</div>
@@ -151,7 +153,6 @@ button:hover, button:active, button:focus {
       </div>
       <button id="login-btn" type="button" onclick="signIn()">登入</button>
       <div class="switch-link" onclick="showSignUp()">我要註冊</div>
-      <div class="msg" id="login-msg"></div>
     </form>
     <form id="signup-form" style="display:none">
       <div class="form-title">註冊</div>
@@ -166,21 +167,24 @@ button:hover, button:active, button:focus {
       </div>
       <button id="signup-btn" type="button" onclick="signUp()">註冊</button>
       <div class="switch-link" onclick="showLogin()">返回登入</div>
-      <div class="msg" id="signup-msg"></div>
     </form>
-    
-<form id="reset-section" style="display:none;" onsubmit="handleResetPassword(event)">
-  <label for="new-password">新密碼</label>
-  <input type="password" id="new-password" placeholder="請輸入新密碼">
-  <label for="confirm-password">請再次輸入新密碼</label>
-  <input type="password" id="confirm-password" placeholder="再次輸入新密碼">
-  <button type="submit" id="reset-btn">送出</button>
-  <div class="msg" id="reset-msg"></div>
-</form>
-
-    
+    <div class="msg" id="login-msg"></div>
   </div>
-  <!-- JS檔案 -->
-  <script src="login.js"></script>
+
+  <!-- 重設密碼頁面（預設隱藏） -->
+  <div id="reset-section" style="display:none;">
+    <h2>重設密碼</h2>
+    <form id="reset-form" onsubmit="handleResetPassword(event)">
+      <label for="new-password">新密碼</label>
+      <input type="password" id="new-password" placeholder="請輸入新密碼">
+      <label for="confirm-password">請再次輸入新密碼</label>
+      <input type="password" id="confirm-password" placeholder="再次輸入新密碼">
+      <button type="submit" id="reset-btn">送出</button>
+      <div class="msg" id="reset-msg"></div>
+    </form>
+  </div>
+</div> 
+<!-- JS檔案 -->
+<script src="login.js"></script>
 </body>
 </html>
