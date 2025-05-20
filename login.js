@@ -28,10 +28,10 @@ function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
     input.type = 'text';
-    btn.textContent = '(ΦωΦ)'; // 閉眼
+    btn.textContent = '(=ω=)'; // 閉眼
   } else {
     input.type = 'password';
-    btn.textContent = '(=ω=)'; // 睜眼
+    btn.textContent = '(ΦωΦ)'; // 睜眼
   }
 }
 
