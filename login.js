@@ -3,7 +3,7 @@ const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ==== 密碼顯示/隱藏 ====
+// 密碼顯示/隱藏（貓咪眼睛）
 function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
@@ -15,7 +15,7 @@ function togglePw(inputId, btn) {
   }
 }
 
-// ==== 登入/註冊切換 ====
+// 登入/註冊切換
 function showSignUp() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = '';
@@ -198,58 +198,34 @@ async function handleResetPassword(e) {
 }
 
 // ==== hash 控制頁面顯示 ====
+// 只要 hash 帶 type=recovery，**一定顯示改密碼**
 document.addEventListener('DOMContentLoaded', handleAuthUI);
 window.addEventListener('hashchange', handleAuthUI);
 
-async function handleAuthUI() {
-  // 預設先全部隱藏，避免閃爍
-  document.getElementById('login-section').style.display = 'none';
-  document.getElementById('reset-section').style.display = 'none';
+function handleAuthUI() {
+  const loginSection = document.getElementById('login-section');
+  const resetSection = document.getElementById('reset-section');
   const msgDiv = document.getElementById('login-msg');
-  msgDiv.textContent = '載入中...';
-  msgDiv.className = 'msg';
-
-  // 確保 Supabase session 準備好（等一下！）
-  let user = null;
-  try {
-    // 等 100ms，給 supabase auth time to catch token
-    await new Promise(r => setTimeout(r, 100));
-    const { data } = await supabase.auth.getUser();
-    user = data && data.user;
-  } catch (e) {
-    user = null;
-  }
-
   const params = new URLSearchParams(window.location.hash.slice(1));
   const type = params.get('type');
   const errorCode = params.get('error_code');
 
-  // 1. 重設密碼（有 token session）
+  // 1. 密碼重設
   if (type === 'recovery') {
-    if (user) {
-      document.getElementById('login-section').style.display = 'none';
-      document.getElementById('reset-section').style.display = '';
-      msgDiv.textContent = '';
-      setTimeout(() => {
-        const pwd = document.getElementById('new-password');
-        if (pwd) pwd.focus();
-      }, 200);
-      return;
-    } else {
-      // 無 session
-      document.getElementById('login-section').style.display = '';
-      document.getElementById('reset-section').style.display = 'none';
-      msgDiv.textContent = '重設密碼連結已失效，請重新申請「忘記密碼」郵件。';
-      msgDiv.className = 'msg';
-      setTimeout(() => { window.location.hash = ''; }, 3500);
-      return;
-    }
+    loginSection.style.display = 'none';
+    resetSection.style.display = '';
+    msgDiv.textContent = '';
+    setTimeout(() => {
+      const pwd = document.getElementById('new-password');
+      if (pwd) pwd.focus();
+    }, 200);
+    return;
   }
 
   // 2. 信箱驗證
   if (type === 'signup') {
-    document.getElementById('login-section').style.display = '';
-    document.getElementById('reset-section').style.display = 'none';
+    loginSection.style.display = '';
+    resetSection.style.display = 'none';
     msgDiv.textContent = '信箱驗證成功，請登入';
     msgDiv.className = 'msg success';
     setTimeout(() => { window.location.hash = ''; }, 2000);
@@ -258,8 +234,8 @@ async function handleAuthUI() {
 
   // 3. 密碼重設連結過期/失效
   if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
-    document.getElementById('login-section').style.display = '';
-    document.getElementById('reset-section').style.display = 'none';
+    loginSection.style.display = '';
+    resetSection.style.display = 'none';
     msgDiv.textContent = '密碼重設連結已過期或失效，請重新申請「忘記密碼」郵件。';
     msgDiv.className = 'msg';
     setTimeout(() => { window.location.hash = ''; }, 4000);
@@ -269,8 +245,8 @@ async function handleAuthUI() {
   // 4. 密碼重設成功帶回登入頁自動填好
   const resetEmail = localStorage.getItem('reset_email');
   if (resetEmail) {
-    document.getElementById('login-section').style.display = '';
-    document.getElementById('reset-section').style.display = 'none';
+    loginSection.style.display = '';
+    resetSection.style.display = 'none';
     const emailInput = document.getElementById('login-email');
     if (emailInput) emailInput.value = resetEmail;
     msgDiv.textContent = '密碼重設成功，請用新密碼登入';
@@ -280,8 +256,11 @@ async function handleAuthUI() {
   }
 
   // 5. 預設顯示登入
-  document.getElementById('login-section').style.display = '';
-  document.getElementById('reset-section').style.display = 'none';
+  loginSection.style.display = '';
+  resetSection.style.display = 'none';
   msgDiv.textContent = '';
   msgDiv.className = 'msg';
 }
+
+// 綁密碼重設送出
+document.getElementById('reset-section')?.addEventListener('submit', handleResetPassword);
