@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>重設密碼</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="login.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="center">
+    <h2>重設密碼</h2>
+    <form id="reset-form">
+      <label for="new-password">新密碼</label>
+      <input type="password" id="new-password" required minlength="6" placeholder="請輸入新密碼">
+      <label for="confirm-password">再次輸入新密碼</label>
+      <input type="password" id="confirm-password" required minlength="6" placeholder="請再次輸入新密碼">
+      <button type="submit">送出</button>
+      <div class="msg" id="reset-msg"></div>
+    </form>
+  </div>
+  <script>
+    const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.getElementById('reset-form').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const pw1 = document.getElementById('new-password').value;
+      const pw2 = document.getElementById('confirm-password').value;
+      const msg = document.getElementById('reset-msg');
+      msg.textContent = '';
+      if(!pw1 || pw1.length<6) {msg.textContent='請輸入至少6位數新密碼';return;}
+      if(pw1!==pw2) {msg.textContent='兩次密碼不一致';return;}
+      // 重設密碼
+      const { error } = await supabase.auth.updateUser({ password: pw1 });
+      if(error) {
+        msg.textContent = '密碼重設失敗: '+error.message;
+        return;
+      }
+      msg.textContent = '密碼重設成功，請重新登入...';
+      setTimeout(()=>{ window.location.href='login.html'; }, 1500);
+    });
+  </script>
+</body>
+</html>
