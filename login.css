@@ -1,0 +1,129 @@
+:root {
+  --main-blue: #143158;
+  --soft-blue: #1d4076;
+  --white: #fff;
+  --light: #f4f7fa;
+  --radius: 1.5rem;
+  --warn: #ff6464;
+}
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--light);
+  min-height: 100vh;
+  color: var(--main-blue);
+  margin: 0;
+}
+.center {
+  max-width: 410px;
+  margin: 48px auto 0 auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 24px 0 #1d40761a;
+  padding: 2.5rem 2rem 2rem 2rem;
+}
+h2 {
+  color: var(--main-blue);
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.form-title {
+  text-align: center;
+  font-weight: 600;
+  color: var(--soft-blue);
+  font-size: 1.09em;
+  margin-bottom: 1.3rem;
+  margin-top: 0;
+  letter-spacing: 0.5px;
+}
+label {
+  font-weight: 500;
+  color: var(--soft-blue);
+  margin-bottom: 0.3em;
+  margin-top: 1em;
+  display: block;
+}
+input {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 0.7rem 0.9rem;
+  font-size: 1.08em;
+  border: 1.2px solid #a6b3c8;
+  border-radius: 0.7rem;
+  background: #f4f7fa;
+  transition: border 0.2s;
+  font-family: 'Noto Sans TC', sans-serif;
+  box-sizing: border-box;
+}
+input:focus {
+  border: 1.2px solid #36b6ff;
+  outline: none;
+  background: #f0f6fc;
+}
+.input-group {
+  position: relative;
+}
+.toggle-pw {
+  position: absolute;
+  right: 14px;
+  top: 11px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+  font-size: 1.14em;
+  color: #4153a4;
+  transition: filter 0.2s;
+  line-height: 1;
+}
+button {
+  background: var(--main-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.95rem 1.4rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.19s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px #1d407615;
+  margin-top: 7px;
+  margin-bottom: 2px;
+}
+button:hover, button:active, button:focus {
+  background: #36b6ff;
+  outline: none;
+}
+.msg {
+  text-align: center;
+  color: var(--warn);
+  min-height: 24px;
+  font-size: 1.01em;
+  margin-top: 8px;
+  margin-bottom: 0.4em;
+  font-weight: 500;
+}
+.success {
+  color: #247f39;
+}
+.switch-link {
+  text-align: center;
+  margin-top: 9px;
+  color: #666;
+  cursor: pointer;
+  font-size: 1.01em;
+  text-decoration: underline;
+  transition: color 0.18s;
+}
+.switch-link:hover { color: #4153a4; }
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  .center { max-width: 99vw; padding: 12vw 2vw 7vw 2vw; }
+  h2 { font-size: 1.07em; }
+  input, button { font-size: 1em; }
+}
