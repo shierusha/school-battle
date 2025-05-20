@@ -202,36 +202,43 @@ document.addEventListener('DOMContentLoaded', handleAuthUI);
 window.addEventListener('hashchange', handleAuthUI);
 
 async function handleAuthUI() {
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const type = params.get('type');
-  const loginSection = document.getElementById('login-section');
-  const resetSection = document.getElementById('reset-section');
+  // 預設先全部隱藏，避免閃爍
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('reset-section').style.display = 'none';
   const msgDiv = document.getElementById('login-msg');
+  msgDiv.textContent = '載入中...';
+  msgDiv.className = 'msg';
 
-  // 檢查 Supabase 是否已自動登入
+  // 確保 Supabase session 準備好（等一下！）
   let user = null;
   try {
+    // 等 100ms，給 supabase auth time to catch token
+    await new Promise(r => setTimeout(r, 100));
     const { data } = await supabase.auth.getUser();
     user = data && data.user;
   } catch (e) {
     user = null;
   }
 
-  // 1. 重設密碼 (需有 session)
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const type = params.get('type');
+  const errorCode = params.get('error_code');
+
+  // 1. 重設密碼（有 token session）
   if (type === 'recovery') {
     if (user) {
-      loginSection.style.display = 'none';
-      resetSection.style.display = '';
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('reset-section').style.display = '';
       msgDiv.textContent = '';
       setTimeout(() => {
         const pwd = document.getElementById('new-password');
-        if(pwd) pwd.focus();
-      }, 150);
+        if (pwd) pwd.focus();
+      }, 200);
       return;
     } else {
-      // 沒有 token（沒有 session），顯示提示
-      loginSection.style.display = '';
-      resetSection.style.display = 'none';
+      // 無 session
+      document.getElementById('login-section').style.display = '';
+      document.getElementById('reset-section').style.display = 'none';
       msgDiv.textContent = '重設密碼連結已失效，請重新申請「忘記密碼」郵件。';
       msgDiv.className = 'msg';
       setTimeout(() => { window.location.hash = ''; }, 3500);
@@ -241,8 +248,8 @@ async function handleAuthUI() {
 
   // 2. 信箱驗證
   if (type === 'signup') {
-    loginSection.style.display = '';
-    resetSection.style.display = 'none';
+    document.getElementById('login-section').style.display = '';
+    document.getElementById('reset-section').style.display = 'none';
     msgDiv.textContent = '信箱驗證成功，請登入';
     msgDiv.className = 'msg success';
     setTimeout(() => { window.location.hash = ''; }, 2000);
@@ -250,10 +257,9 @@ async function handleAuthUI() {
   }
 
   // 3. 密碼重設連結過期/失效
-  const errorCode = params.get('error_code');
   if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
-    loginSection.style.display = '';
-    resetSection.style.display = 'none';
+    document.getElementById('login-section').style.display = '';
+    document.getElementById('reset-section').style.display = 'none';
     msgDiv.textContent = '密碼重設連結已過期或失效，請重新申請「忘記密碼」郵件。';
     msgDiv.className = 'msg';
     setTimeout(() => { window.location.hash = ''; }, 4000);
@@ -263,8 +269,8 @@ async function handleAuthUI() {
   // 4. 密碼重設成功帶回登入頁自動填好
   const resetEmail = localStorage.getItem('reset_email');
   if (resetEmail) {
-    loginSection.style.display = '';
-    resetSection.style.display = 'none';
+    document.getElementById('login-section').style.display = '';
+    document.getElementById('reset-section').style.display = 'none';
     const emailInput = document.getElementById('login-email');
     if (emailInput) emailInput.value = resetEmail;
     msgDiv.textContent = '密碼重設成功，請用新密碼登入';
@@ -274,8 +280,8 @@ async function handleAuthUI() {
   }
 
   // 5. 預設顯示登入
-  loginSection.style.display = '';
-  resetSection.style.display = 'none';
+  document.getElementById('login-section').style.display = '';
+  document.getElementById('reset-section').style.display = 'none';
   msgDiv.textContent = '';
   msgDiv.className = 'msg';
 }
