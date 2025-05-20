@@ -100,7 +100,22 @@
         // 跳轉回登入頁（根據你的登入頁名稱修改）
         window.location.href = "login.html";
       }, 1300);
-    }
+    }if (!sessionUser) {
+  msgDiv.textContent = '重設連結已失效，請重新申請。將自動回登入頁...';
+  setLoading(false);
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 1500);
+  return;
+}
+    if (error) {
+  msgDiv.textContent = '密碼重設失敗: ' + error.message + '。將自動回登入頁...';
+  setLoading(false);
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 1500);
+  return;
+}
   </script>
 </body>
 </html>
