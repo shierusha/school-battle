@@ -1,9 +1,9 @@
-// Supabase 設定
+// ====== Supabase 設定 ======
 const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 密碼顯示/隱藏
+// ==== 密碼顯示/隱藏（貓咪眼睛）====
 function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
@@ -15,17 +15,21 @@ function togglePw(inputId, btn) {
   }
 }
 
-// 註冊/登入切換
+// ===== 表單切換 =====
 function showSignUp() {
-  document.getElementById('login-section').style.display = 'none';
-  document.getElementById('signup-section').style.display = '';
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = '';
+  document.getElementById('forgot-form').style.display = 'none';
   document.getElementById('login-msg').textContent = '';
   document.getElementById('signup-msg').textContent = '';
+  document.getElementById('forgot-msg').textContent = '';
 }
-function showLogin(msg = '') {
-  document.getElementById('login-section').style.display = '';
-  document.getElementById('signup-section').style.display = 'none';
+function showLogin(msg='') {
+  document.getElementById('login-form').style.display = '';
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = 'none';
   document.getElementById('signup-msg').textContent = '';
+  document.getElementById('forgot-msg').textContent = '';
   if (msg) {
     document.getElementById('login-msg').textContent = msg;
     document.getElementById('login-msg').className = 'msg success';
@@ -34,12 +38,21 @@ function showLogin(msg = '') {
     document.getElementById('login-msg').className = 'msg';
   }
 }
+function showForgot() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = '';
+  document.getElementById('login-msg').textContent = '';
+  document.getElementById('signup-msg').textContent = '';
+  document.getElementById('forgot-msg').textContent = '';
+}
 function setLoading(isLoading) {
   document.getElementById('login-btn').classList.toggle('loading', isLoading);
   document.getElementById('signup-btn').classList.toggle('loading', isLoading);
+  document.getElementById('forgot-btn').classList.toggle('loading', isLoading);
 }
 
-// ====== 註冊 ======
+// ============ 註冊 ============
 async function signUp() {
   setLoading(true);
   document.getElementById('signup-msg').textContent = '';
@@ -51,6 +64,7 @@ async function signUp() {
     setLoading(false);
     return;
   }
+
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signUp({ email, password }));
@@ -70,6 +84,7 @@ async function signUp() {
     setLoading(false);
     return;
   }
+
   let insertError;
   try {
     ({ error: insertError } = await supabase.from('players').insert({
@@ -92,7 +107,7 @@ async function signUp() {
   showLogin('註冊成功，請驗證信箱！');
 }
 
-// ====== 登入 ======
+// ============ 登入 ============
 async function signIn() {
   setLoading(true);
   document.getElementById('login-msg').textContent = '';
@@ -123,6 +138,7 @@ async function signIn() {
     return;
   }
   localStorage.setItem('player_id', user.id);
+
   // 查詢玩家表
   let player, playerError;
   try {
@@ -142,20 +158,13 @@ async function signIn() {
     return;
   }
   localStorage.setItem('player_username', player.username);
+
   setTimeout(() => {
     window.location.href = 'https://sheruka-game.github.io/create-student/creat-st.html';
   }, 600);
 }
 
-function showForgot() {
-  document.getElementById('login-form').style.display = 'none';
-  document.getElementById('signup-form').style.display = 'none';
-  document.getElementById('forgot-form').style.display = '';
-  document.getElementById('login-msg').textContent = '';
-  document.getElementById('signup-msg').textContent = '';
-  document.getElementById('forgot-msg').textContent = '';
-}
-
+// ============ 忘記密碼 ============
 async function handleForgot(e) {
   e.preventDefault();
   const email = document.getElementById('forgot-email').value.trim();
@@ -168,7 +177,7 @@ async function handleForgot(e) {
   document.getElementById('forgot-btn').classList.add('loading');
   // 寄送 reset password 信
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://你的網域/reset.html'
+    redirectTo: 'https://sheruka-game.github.io/school-battle/reset.html'
   });
   document.getElementById('forgot-btn').classList.remove('loading');
   if (error) {
@@ -179,3 +188,7 @@ async function handleForgot(e) {
   }
 }
 
+// 初始化顯示登入
+document.addEventListener('DOMContentLoaded', function() {
+  showLogin();
+});
