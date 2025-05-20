@@ -8,10 +8,10 @@ function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
     input.type = 'text';
-    btn.textContent = '(=ω=)';
+    btn.textContent = '(ΦωΦ)';
   } else {
     input.type = 'password';
-    btn.textContent = '(ΦωΦ)';
+    btn.textContent = '(=ω=)';
   }
 }
 
