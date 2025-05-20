@@ -208,20 +208,38 @@ async function handleAuthUI() {
   const resetSection = document.getElementById('reset-section');
   const msgDiv = document.getElementById('login-msg');
 
-  // 1. 只要 hash 裡有 type=recovery 就一定顯示重設密碼
-  if (type === 'recovery') {
-    loginSection.style.display = 'none';
-    resetSection.style.display = '';
-    msgDiv.textContent = '';
-    // 自動聚焦密碼
-    setTimeout(() => {
-      const pwd = document.getElementById('new-password');
-      if(pwd) pwd.focus();
-    }, 150);
-    return;
+  // 檢查 Supabase 是否已自動登入
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data && data.user;
+  } catch (e) {
+    user = null;
   }
 
-  // 2. 信箱驗證（type=signup）
+  // 1. 重設密碼 (需有 session)
+  if (type === 'recovery') {
+    if (user) {
+      loginSection.style.display = 'none';
+      resetSection.style.display = '';
+      msgDiv.textContent = '';
+      setTimeout(() => {
+        const pwd = document.getElementById('new-password');
+        if(pwd) pwd.focus();
+      }, 150);
+      return;
+    } else {
+      // 沒有 token（沒有 session），顯示提示
+      loginSection.style.display = '';
+      resetSection.style.display = 'none';
+      msgDiv.textContent = '重設密碼連結已失效，請重新申請「忘記密碼」郵件。';
+      msgDiv.className = 'msg';
+      setTimeout(() => { window.location.hash = ''; }, 3500);
+      return;
+    }
+  }
+
+  // 2. 信箱驗證
   if (type === 'signup') {
     loginSection.style.display = '';
     resetSection.style.display = 'none';
