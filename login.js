@@ -3,7 +3,19 @@ const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 切換 註冊/登入 畫面
+// 密碼顯示/隱藏（貓咪眼睛）
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '(=ω=)';
+  } else {
+    input.type = 'password';
+    btn.textContent = '(ΦωΦ)';
+  }
+}
+
+// 登入/註冊切換
 function showSignUp() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = '';
@@ -22,19 +34,6 @@ function showLogin(msg='') {
     document.getElementById('login-msg').className = 'msg';
   }
 }
-
-// 密碼顯示/隱藏＋貓咪顏文字切換
-function togglePw(inputId, btn) {
-  const input = document.getElementById(inputId);
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.textContent = '(=ω=)'; // 閉眼
-  } else {
-    input.type = 'password';
-    btn.textContent = '(ΦωΦ)'; // 睜眼
-  }
-}
-
 function setLoading(isLoading) {
   document.getElementById('login-btn').classList.toggle('loading', isLoading);
   document.getElementById('signup-btn').classList.toggle('loading', isLoading);
@@ -55,7 +54,6 @@ async function signUp() {
     return;
   }
 
-  // 1. Auth 註冊
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signUp({ email, password }));
@@ -76,7 +74,6 @@ async function signUp() {
     return;
   }
 
-  // 2. 註冊成功後，插入玩家表
   let insertError;
   try {
     ({ error: insertError } = await supabase.from('players').insert({
@@ -110,7 +107,6 @@ async function signIn() {
     setLoading(false);
     return;
   }
-  // 1. Auth 登入
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
@@ -132,7 +128,7 @@ async function signIn() {
   }
   localStorage.setItem('player_id', user.id);
 
-  // 2. 查詢玩家表
+  // 查詢玩家表
   let player, playerError;
   try {
     ({ data: player, error: playerError } = await supabase
@@ -150,11 +146,8 @@ async function signIn() {
     setLoading(false);
     return;
   }
-
-  // 你可以存在 localStorage，之後用 player.username
   localStorage.setItem('player_username', player.username);
 
-  // 登入成功自動跳轉
   setTimeout(() => {
     window.location.href = 'https://sheruka-game.github.io/create-student/creat-st.html';
   }, 600);
@@ -196,57 +189,76 @@ async function handleResetPassword(e) {
     window.location.hash = '';
     document.getElementById('login-section').style.display = '';
     document.getElementById('reset-section').style.display = 'none';
-    // window.location.href = 'index.html'; // 如果是獨立重設頁請打開這行
+    // window.location.href = 'login.html'; // 如果是獨立 reset 頁才用
   }, 1200);
 }
 
-// ============ 頁面初始化/根據 hash 決定顯示什麼 ============
+// ============ 頁面初始化/根據狀況顯示內容 ============
 document.addEventListener('DOMContentLoaded', async function() {
-  // 依 hash 決定顯示登入/重設
   const params = new URLSearchParams(window.location.hash.slice(1));
   const type = params.get('type');
+  const errorCode = params.get('error_code');
+  const errorMsg = params.get('error_description');
+  const resetSection = document.getElementById('reset-section');
+  const loginSection = document.getElementById('login-section');
+  const msgDiv = document.getElementById('login-msg');
 
-  // 密碼重設流程
-  if (type === 'recovery') {
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('reset-section').style.display = '';
-    // 自動填 email
-    const { data: userData } = await supabase.auth.getUser();
+  // 1. 過期/失效
+  if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
+    resetSection.style.display = 'none';
+    loginSection.style.display = '';
+    msgDiv.textContent = '密碼重設連結已過期或失效，請重新申請「忘記密碼」郵件。';
+    msgDiv.className = 'msg';
+    setTimeout(() => { window.location.hash = ''; }, 4000);
+    return;
+  }
+
+  // 2. 密碼重設 or session 有 user
+  const { data: userData } = await supabase.auth.getUser();
+  const resetEmail = localStorage.getItem('reset_email');
+  if (type === 'recovery' || (!type && userData && userData.user)) {
+    resetSection.style.display = '';
+    loginSection.style.display = 'none';
+    // 可自動填 email
     if (userData && userData.user && userData.user.email) {
       const emailInput = document.getElementById('login-email');
       if (emailInput) emailInput.value = userData.user.email;
     }
+    msgDiv.textContent = '請輸入新密碼';
+    msgDiv.className = 'msg';
     return;
   }
-  // 信箱驗證流程
+
+  // 3. 信箱驗證
   if (type === 'signup') {
-    document.getElementById('login-section').style.display = '';
-    document.getElementById('reset-section').style.display = 'none';
+    resetSection.style.display = 'none';
+    loginSection.style.display = '';
     // 自動填 email
-    const { data: userData } = await supabase.auth.getUser();
     if (userData && userData.user && userData.user.email) {
       const emailInput = document.getElementById('login-email');
       if (emailInput) emailInput.value = userData.user.email;
-      document.getElementById('login-msg').textContent = '信箱驗證成功，請登入';
-      document.getElementById('login-msg').className = 'msg success';
+      msgDiv.textContent = '信箱驗證成功，請登入';
+      msgDiv.className = 'msg success';
     }
     setTimeout(() => { window.location.hash = ''; }, 2000);
     return;
   }
-  // 密碼重設成功帶回登入頁自動填好
-  const resetEmail = localStorage.getItem('reset_email');
+
+  // 4. 密碼重設成功帶回登入頁自動填好
   if (resetEmail) {
     const emailInput = document.getElementById('login-email');
     if (emailInput) emailInput.value = resetEmail;
-    document.getElementById('login-msg').textContent = '密碼重設成功，請用新密碼登入';
-    document.getElementById('login-msg').className = 'msg success';
+    msgDiv.textContent = '密碼重設成功，請用新密碼登入';
+    msgDiv.className = 'msg success';
     localStorage.removeItem('reset_email');
   }
 
-  // 預設顯示登入
-  document.getElementById('login-section').style.display = '';
-  document.getElementById('reset-section').style.display = 'none';
+  // 5. 預設顯示登入
+  resetSection.style.display = 'none';
+  loginSection.style.display = '';
+  msgDiv.textContent = '';
+  msgDiv.className = 'msg';
 });
 
-// (如果用 <form onsubmit="...">，不需額外綁定事件，否則可這樣)
+// 可選：form 綁 submit
 // document.getElementById('reset-section').addEventListener('submit', handleResetPassword);
