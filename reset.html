@@ -6,15 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- 字體 -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="login.css">
-  <!-- Supabase JS -->
+  <link rel="stylesheet" href="login.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
 </head>
 <body>
   <div class="center">
     <h2>謝爾夏｜密碼重設</h2>
-    <form id="reset-section" onsubmit="handleResetPassword(event)">
+    <form id="reset-section" onsubmit="handleResetPassword(event)" style="display:none">
       <label for="new-password">新密碼</label>
       <div class="input-group">
         <input type="password" id="new-password" placeholder="請輸入新密碼" required>
@@ -29,13 +27,22 @@
       <div class="msg" id="reset-msg"></div>
     </form>
   </div>
+
   <script>
-    // Supabase 設定
     const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 密碼顯示/隱藏（貓咪眼睛）
+    // 頁面載入時判斷連結類型
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+
+    if (type !== 'recovery') {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('reset-section').style.display = '';
+    }
+
     function togglePw(inputId, btn) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -51,10 +58,8 @@
       document.getElementById('reset-btn').classList.toggle('loading', isLoading);
     }
 
-    // 密碼重設
     async function handleResetPassword(e) {
       if (e) e.preventDefault();
-
       const newPassword = document.getElementById('new-password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
       const msgDiv = document.getElementById('reset-msg');
@@ -70,14 +75,12 @@
       }
 
       setLoading(true);
-
-      // 檢查 session（必須有 session，否則密碼無法改）
       let sessionUser = null;
       try {
-        await new Promise(r => setTimeout(r, 100)); // 讓 supabase 載入 token
+        await new Promise(r => setTimeout(r, 100));
         const { data } = await supabase.auth.getUser();
         sessionUser = data && data.user;
-      } catch (e) {
+      } catch (_) {
         sessionUser = null;
       }
 
@@ -102,7 +105,6 @@
 
       msgDiv.textContent = '密碼重設成功，請重新登入！';
       setLoading(false);
-
       setTimeout(() => {
         window.location.href = "login.html";
       }, 1300);
