@@ -1,9 +1,9 @@
-// Supabase 設定
+// === Supabase 設定 ===
 const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 密碼顯示/隱藏（貓咪眼睛）
+// ==== 密碼顯示/隱藏 ====
 function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
@@ -15,12 +15,11 @@ function togglePw(inputId, btn) {
   }
 }
 
-// 登入/註冊切換
+// ==== 登入/註冊切換 ====
 function showSignUp() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = '';
   document.getElementById('login-msg').textContent = '';
-  document.getElementById('signup-msg').textContent = '';
 }
 function showLogin(msg='') {
   document.getElementById('login-form').style.display = '';
@@ -187,78 +186,74 @@ async function handleResetPassword(e) {
   setLoading(false);
   setTimeout(() => {
     window.location.hash = '';
+    showLogin();
     document.getElementById('login-section').style.display = '';
     document.getElementById('reset-section').style.display = 'none';
-    // window.location.href = 'login.html'; // 如果是獨立 reset 頁才用
+    // 自動填好信箱
+    const emailInput = document.getElementById('login-email');
+    if (emailInput && userData && userData.user && userData.user.email) {
+      emailInput.value = userData.user.email;
+    }
   }, 1200);
 }
 
-// ============ 頁面初始化/根據狀況顯示內容 ============
-document.addEventListener('DOMContentLoaded', async function() {
+// ==== hash 控制頁面顯示 ====
+document.addEventListener('DOMContentLoaded', handleAuthUI);
+window.addEventListener('hashchange', handleAuthUI);
+
+async function handleAuthUI() {
   const params = new URLSearchParams(window.location.hash.slice(1));
   const type = params.get('type');
   const errorCode = params.get('error_code');
   const errorMsg = params.get('error_description');
-  const resetSection = document.getElementById('reset-section');
   const loginSection = document.getElementById('login-section');
+  const resetSection = document.getElementById('reset-section');
   const msgDiv = document.getElementById('login-msg');
 
-  // 1. 過期/失效
-  if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
-    resetSection.style.display = 'none';
+  // 1. hash 有 type=recovery 就顯示重設密碼
+  if (type === 'recovery') {
+    loginSection.style.display = 'none';
+    resetSection.style.display = '';
+    msgDiv.textContent = '';
+    return;
+  }
+
+  // 2. hash 有信箱驗證成功
+  if (type === 'signup') {
     loginSection.style.display = '';
+    resetSection.style.display = 'none';
+    msgDiv.textContent = '信箱驗證成功，請登入';
+    msgDiv.className = 'msg success';
+    setTimeout(() => { window.location.hash = ''; }, 2000);
+    return;
+  }
+
+  // 3. hash 有過期
+  if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
+    loginSection.style.display = '';
+    resetSection.style.display = 'none';
     msgDiv.textContent = '密碼重設連結已過期或失效，請重新申請「忘記密碼」郵件。';
     msgDiv.className = 'msg';
     setTimeout(() => { window.location.hash = ''; }, 4000);
     return;
   }
 
-  // 2. 密碼重設 or session 有 user
-  const { data: userData } = await supabase.auth.getUser();
-  const resetEmail = localStorage.getItem('reset_email');
-  if (type === 'recovery' || (!type && userData && userData.user)) {
-    resetSection.style.display = '';
-    loginSection.style.display = 'none';
-    // 可自動填 email
-    if (userData && userData.user && userData.user.email) {
-      const emailInput = document.getElementById('login-email');
-      if (emailInput) emailInput.value = userData.user.email;
-    }
-    msgDiv.textContent = '請輸入新密碼';
-    msgDiv.className = 'msg';
-    return;
-  }
-
-  // 3. 信箱驗證
-  if (type === 'signup') {
-    resetSection.style.display = 'none';
-    loginSection.style.display = '';
-    // 自動填 email
-    if (userData && userData.user && userData.user.email) {
-      const emailInput = document.getElementById('login-email');
-      if (emailInput) emailInput.value = userData.user.email;
-      msgDiv.textContent = '信箱驗證成功，請登入';
-      msgDiv.className = 'msg success';
-    }
-    setTimeout(() => { window.location.hash = ''; }, 2000);
-    return;
-  }
-
   // 4. 密碼重設成功帶回登入頁自動填好
+  const resetEmail = localStorage.getItem('reset_email');
   if (resetEmail) {
+    loginSection.style.display = '';
+    resetSection.style.display = 'none';
     const emailInput = document.getElementById('login-email');
     if (emailInput) emailInput.value = resetEmail;
     msgDiv.textContent = '密碼重設成功，請用新密碼登入';
     msgDiv.className = 'msg success';
     localStorage.removeItem('reset_email');
+    return;
   }
 
   // 5. 預設顯示登入
-  resetSection.style.display = 'none';
   loginSection.style.display = '';
+  resetSection.style.display = 'none';
   msgDiv.textContent = '';
   msgDiv.className = 'msg';
-});
-
-// 可選：form 綁 submit
-// document.getElementById('reset-section').addEventListener('submit', handleResetPassword);
+}
