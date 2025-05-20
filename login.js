@@ -146,3 +146,36 @@ async function signIn() {
     window.location.href = 'https://sheruka-game.github.io/create-student/creat-st.html';
   }, 600);
 }
+
+function showForgot() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = '';
+  document.getElementById('login-msg').textContent = '';
+  document.getElementById('signup-msg').textContent = '';
+  document.getElementById('forgot-msg').textContent = '';
+}
+
+async function handleForgot(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgot-email').value.trim();
+  const msgDiv = document.getElementById('forgot-msg');
+  msgDiv.textContent = '';
+  if (!email) {
+    msgDiv.textContent = '請輸入電子信箱';
+    return;
+  }
+  document.getElementById('forgot-btn').classList.add('loading');
+  // 寄送 reset password 信
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://你的網域/reset.html'
+  });
+  document.getElementById('forgot-btn').classList.remove('loading');
+  if (error) {
+    msgDiv.textContent = '寄送失敗: ' + error.message;
+  } else {
+    msgDiv.textContent = '已寄送密碼重設信到你的信箱，請查收！';
+    msgDiv.className = 'msg success';
+  }
+}
+
