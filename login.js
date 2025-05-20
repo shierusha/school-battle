@@ -1,4 +1,4 @@
-// 你的 Supabase 設定
+// Supabase 設定
 const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -40,7 +40,7 @@ function setLoading(isLoading) {
   document.getElementById('signup-btn').classList.toggle('loading', isLoading);
 }
 
-// 註冊
+// ============ 註冊 ============
 async function signUp() {
   setLoading(true);
   document.getElementById('signup-msg').textContent = '';
@@ -53,6 +53,7 @@ async function signUp() {
     return;
   }
 
+  // 1. Auth 註冊
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signUp({ email, password }));
@@ -61,14 +62,11 @@ async function signUp() {
     setLoading(false);
     return;
   }
-
   if (error) {
     document.getElementById('signup-msg').textContent = '註冊失敗: ' + error.message;
     setLoading(false);
     return;
   }
-
-  // 檢查 data.user 是否有值
   const user = data.user;
   if (!user) {
     document.getElementById('signup-msg').textContent = '請檢查信箱驗證設定，註冊未成功。';
@@ -76,7 +74,7 @@ async function signUp() {
     return;
   }
 
-  // 將使用者加入 players 表
+  // 2. 註冊成功後，插入玩家表
   let insertError;
   try {
     ({ error: insertError } = await supabase.from('players').insert({
@@ -99,7 +97,7 @@ async function signUp() {
   showLogin('註冊成功，請驗證信箱！');
 }
 
-// 登入
+// ============ 登入 ============
 async function signIn() {
   setLoading(true);
   document.getElementById('login-msg').textContent = '';
@@ -110,6 +108,7 @@ async function signIn() {
     setLoading(false);
     return;
   }
+  // 1. Auth 登入
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
@@ -130,24 +129,29 @@ async function signIn() {
     return;
   }
   localStorage.setItem('player_id', user.id);
-  // upsert players
-  let upsertError;
+
+  // 2. 查詢玩家表
+  let player, playerError;
   try {
-    ({ error: upsertError } = await supabase.from('players').upsert({
-      player_id: user.id,
-      email: user.email,
-      role: 'player'
-    }));
+    ({ data: player, error: playerError } = await supabase
+      .from('players')
+      .select('*')
+      .eq('player_id', user.id)
+      .single());
   } catch (e) {
-    document.getElementById('login-msg').textContent = '無法連線到伺服器';
+    document.getElementById('login-msg').textContent = '無法查詢玩家資料';
     setLoading(false);
     return;
   }
-  if (upsertError) {
-    document.getElementById('login-msg').textContent = '寫入玩家表失敗: ' + upsertError.message;
+  if (playerError) {
+    document.getElementById('login-msg').textContent = '查無玩家資料，請重新註冊';
     setLoading(false);
     return;
   }
+
+  // 你可以存在 localStorage，之後用 player.username
+  localStorage.setItem('player_username', player.username);
+
   // 登入成功自動跳轉
   setTimeout(() => {
     window.location.href = 'https://sheruka-game.github.io/create-student/creat-st.html';
