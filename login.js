@@ -204,21 +204,24 @@ window.addEventListener('hashchange', handleAuthUI);
 async function handleAuthUI() {
   const params = new URLSearchParams(window.location.hash.slice(1));
   const type = params.get('type');
-  const errorCode = params.get('error_code');
-  const errorMsg = params.get('error_description');
   const loginSection = document.getElementById('login-section');
   const resetSection = document.getElementById('reset-section');
   const msgDiv = document.getElementById('login-msg');
 
-  // 1. hash 有 type=recovery 就顯示重設密碼
+  // 1. 只要 hash 裡有 type=recovery 就一定顯示重設密碼
   if (type === 'recovery') {
     loginSection.style.display = 'none';
     resetSection.style.display = '';
     msgDiv.textContent = '';
+    // 自動聚焦密碼
+    setTimeout(() => {
+      const pwd = document.getElementById('new-password');
+      if(pwd) pwd.focus();
+    }, 150);
     return;
   }
 
-  // 2. hash 有信箱驗證成功
+  // 2. 信箱驗證（type=signup）
   if (type === 'signup') {
     loginSection.style.display = '';
     resetSection.style.display = 'none';
@@ -228,7 +231,8 @@ async function handleAuthUI() {
     return;
   }
 
-  // 3. hash 有過期
+  // 3. 密碼重設連結過期/失效
+  const errorCode = params.get('error_code');
   if (errorCode === 'otp_expired' || params.get('error') === 'access_denied') {
     loginSection.style.display = '';
     resetSection.style.display = 'none';
