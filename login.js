@@ -1,6 +1,6 @@
 // ====== Supabase 設定 ======
 const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
-const SUPABASE_KEY = '你的KEY'; // 只改這裡，其他不動
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz...'; // 你的原 key
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 顯示/隱藏密碼
