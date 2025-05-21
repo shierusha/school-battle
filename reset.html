@@ -34,26 +34,30 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // 頁面載入時判斷連結類型
-    const urlParams = new URLSearchParams(window.location.search);
-    const type = urlParams.get('type');
+const urlParams = new URLSearchParams(window.location.search);
+const type = urlParams.get('type');
 
-// 僅允許 recovery 進來
-if (type !== 'recovery') {
-  window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-}else {
-      document.getElementById('reset-section').style.display = '';
-    }
+window.addEventListener('DOMContentLoaded', () => {
+  if (type !== 'recovery') {
+    // 若不是從重設密碼信點進來，就導回登入頁
+    window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+  } else {
+    // 顯示 reset 表單
+    document.getElementById('reset-section').style.display = '';
+  }
+});
 
-    function togglePw(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '(=ω=)';
-      } else {
-        input.type = 'password';
-        btn.textContent = '(ΦωΦ)';
-      }
-    }
+// 顯示/隱藏密碼
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '(=ω=)';
+  } else {
+    input.type = 'password';
+    btn.textContent = '(ΦωΦ)';
+  }
+}
 
     function setLoading(isLoading) {
       document.getElementById('reset-btn').classList.toggle('loading', isLoading);
