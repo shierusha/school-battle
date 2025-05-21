@@ -24,12 +24,21 @@ function showSignUp() {
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
 }
-function showLogin(msg='') {
+
+function showLogin(msg = '') {
   document.getElementById('login-form').style.display = '';
   document.getElementById('signup-form').style.display = 'none';
   document.getElementById('forgot-form').style.display = 'none';
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
+
+  // ✅ 自動填入註冊信箱
+  const savedEmail = localStorage.getItem('last_signup_email');
+  if (savedEmail) {
+    document.getElementById('login-email').value = savedEmail;
+    localStorage.removeItem('last_signup_email');
+  }
+
   if (msg) {
     document.getElementById('login-msg').textContent = msg;
     document.getElementById('login-msg').className = 'msg success';
@@ -38,6 +47,7 @@ function showLogin(msg='') {
     document.getElementById('login-msg').className = 'msg';
   }
 }
+
 function showForgot() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = 'none';
@@ -46,6 +56,7 @@ function showForgot() {
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
 }
+
 function setLoading(isLoading) {
   document.getElementById('login-btn').classList.toggle('loading', isLoading);
   document.getElementById('signup-btn').classList.toggle('loading', isLoading);
@@ -59,6 +70,7 @@ async function signUp() {
   const email = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
   const username = document.getElementById('signup-username').value.trim();
+
   if (!email || !password || !username) {
     document.getElementById('signup-msg').textContent = '請填寫所有欄位';
     setLoading(false);
@@ -73,17 +85,22 @@ async function signUp() {
     setLoading(false);
     return;
   }
+
   if (error) {
     document.getElementById('signup-msg').textContent = '註冊失敗: ' + error.message;
     setLoading(false);
     return;
   }
+
   const user = data.user;
   if (!user) {
     document.getElementById('signup-msg').textContent = '請檢查信箱驗證設定，註冊未成功。';
     setLoading(false);
     return;
   }
+
+  // ✅ 記住信箱給登入用
+  localStorage.setItem('last_signup_email', email);
 
   let insertError;
   try {
@@ -98,11 +115,13 @@ async function signUp() {
     setLoading(false);
     return;
   }
+
   if (insertError) {
     document.getElementById('signup-msg').textContent = '玩家資料儲存失敗: ' + insertError.message;
     setLoading(false);
     return;
   }
+
   setLoading(false);
   showLogin('註冊成功，請驗證信箱！');
 }
@@ -113,11 +132,13 @@ async function signIn() {
   document.getElementById('login-msg').textContent = '';
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
+
   if (!email || !password) {
     document.getElementById('login-msg').textContent = '請輸入帳號與密碼';
     setLoading(false);
     return;
   }
+
   let data, error;
   try {
     ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
@@ -126,20 +147,22 @@ async function signIn() {
     setLoading(false);
     return;
   }
+
   if (error) {
     document.getElementById('login-msg').textContent = '登入失敗: ' + error.message;
     setLoading(false);
     return;
   }
+
   const user = data.user;
   if (!user) {
     document.getElementById('login-msg').textContent = '帳號異常，請確認信箱驗證';
     setLoading(false);
     return;
   }
+
   localStorage.setItem('player_id', user.id);
 
-  // 查詢玩家表
   let player, playerError;
   try {
     ({ data: player, error: playerError } = await supabase
@@ -152,11 +175,13 @@ async function signIn() {
     setLoading(false);
     return;
   }
+
   if (playerError) {
     document.getElementById('login-msg').textContent = '查無玩家資料，請重新註冊';
     setLoading(false);
     return;
   }
+
   localStorage.setItem('player_username', player.username);
 
   setTimeout(() => {
@@ -170,25 +195,29 @@ async function handleForgot(e) {
   const email = document.getElementById('forgot-email').value.trim();
   const msgDiv = document.getElementById('forgot-msg');
   msgDiv.textContent = '';
+
   if (!email) {
     msgDiv.textContent = '請輸入電子信箱';
     return;
   }
+
   document.getElementById('forgot-btn').classList.add('loading');
-  // 寄送 reset password 信
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'https://sheruka-game.github.io/school-battle/reset.html'
   });
+
   document.getElementById('forgot-btn').classList.remove('loading');
+
   if (error) {
     msgDiv.textContent = '寄送失敗: ' + error.message;
   } else {
-    msgDiv.textContent = '已寄送密碼重設信到你的信箱，請查收！';
+    msgDiv.textContent = '如果你已註冊，我們已寄出密碼重設信，請查收信箱。';
     msgDiv.className = 'msg success';
   }
 }
 
 // 初始化顯示登入
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   showLogin();
 });
