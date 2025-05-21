@@ -40,7 +40,10 @@
 // 僅允許 recovery 進來
 if (type !== 'recovery') {
   window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-}
+}else {
+      document.getElementById('reset-section').style.display = '';
+    }
+
     function togglePw(inputId, btn) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
