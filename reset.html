@@ -37,12 +37,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const type = urlParams.get('type');
 
-    if (type !== 'recovery') {
-      window.location.href = 'login.html';
-    } else {
-      document.getElementById('reset-section').style.display = '';
-    }
-
+// 僅允許 recovery 進來
+if (type !== 'recovery') {
+  window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+}
     function togglePw(inputId, btn) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
