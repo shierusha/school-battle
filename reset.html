@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>謝爾夏｜密碼重設</title>
+  <title>謝爾夏</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
@@ -10,7 +10,18 @@
 </head>
 <body>
   <div class="center">
-    <h2>謝爾夏｜密碼重設</h2>
+    <h2>謝爾夏｜帳號驗證</h2>
+
+    <!-- ⏳ loading -->
+    <div id="loading-section">正在驗證中... 請稍候喵 (ฅ´ω`ฅ)</div>
+
+    <!-- ✅ signup 驗證成功 -->
+    <div id="signup-section" style="display:none">
+      <p class="msg success">信箱驗證成功，請返回登入畫面！</p>
+      <button onclick="goLogin()">返回登入</button>
+    </div>
+
+    <!-- 🔐 reset password -->
     <form id="reset-section" style="display:none;" onsubmit="handleResetPassword(event)">
       <label for="new-password">新密碼</label>
       <div class="input-group">
@@ -50,36 +61,43 @@
       return hashType;
     }
 
+    function goLogin() {
+      window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+    }
+
     window.addEventListener('DOMContentLoaded', async () => {
-      // Step 1: 嘗試從 hash 拿 token → 設定 session
       const hashParams = new URLSearchParams(window.location.hash.slice(1));
       const access_token = hashParams.get('access_token');
       const refresh_token = hashParams.get('refresh_token');
+      const type = getTypeFromURL();
+
+      // 顯示 loading
+      document.getElementById('loading-section').style.display = 'block';
+
       if (access_token && refresh_token) {
         try {
           await supabase.auth.setSession({ access_token, refresh_token });
         } catch (err) {
-          console.error('登入失敗:', err);
+          console.warn('登入失敗:', err);
         }
       }
 
-      // Step 2: 判斷 type
-      const type = getTypeFromURL();
-      if (type !== 'recovery') {
-        window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-        return;
-      }
+      await new Promise(r => setTimeout(r, 500)); // loading 顯示一下下
 
-      // Step 3: 顯示畫面
-      document.getElementById('reset-section').style.display = '';
-
-      // Step 4: 檢查 session 成功否
-      const { data } = await supabase.auth.getUser();
-      if (!data || !data.user) {
-        document.getElementById('reset-msg').textContent = '連結已過期或無效，請重新申請。';
-        setTimeout(() => {
-          window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-        }, 2000);
+      if (type === 'recovery') {
+        const { data } = await supabase.auth.getUser();
+        if (!data?.user) {
+          document.getElementById('loading-section').textContent = '連結已過期或無效，請重新申請。';
+          setTimeout(goLogin, 2000);
+          return;
+        }
+        document.getElementById('loading-section').style.display = 'none';
+        document.getElementById('reset-section').style.display = 'block';
+      } else if (type === 'signup') {
+        document.getElementById('loading-section').style.display = 'none';
+        document.getElementById('signup-section').style.display = 'block';
+      } else {
+        document.getElementById('loading-section').textContent = '連結參數錯誤，請從信箱重新點擊。';
       }
     });
 
@@ -105,17 +123,13 @@
       if (error) {
         msgDiv.textContent = '密碼重設失敗: ' + error.message;
         document.getElementById('reset-btn').classList.remove('loading');
-        setTimeout(() => {
-          window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-        }, 2000);
+        setTimeout(goLogin, 2000);
         return;
       }
 
       msgDiv.textContent = '密碼重設成功，將導回登入頁！';
       document.getElementById('reset-btn').classList.remove('loading');
-      setTimeout(() => {
-        window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-      }, 1500);
+      setTimeout(goLogin, 1500);
     }
   </script>
 </body>
