@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>謝爾夏｜密碼重設</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- 字體 -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -12,7 +11,7 @@
 <body>
   <div class="center">
     <h2>謝爾夏｜密碼重設</h2>
-    <form id="reset-section" onsubmit="handleResetPassword(event)" style="display:none">
+    <form id="reset-section" style="display:none;" onsubmit="handleResetPassword(event)">
       <label for="new-password">新密碼</label>
       <div class="input-group">
         <input type="password" id="new-password" placeholder="請輸入新密碼" required>
@@ -29,42 +28,63 @@
   </div>
 
   <script>
+    // Supabase 設定
     const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 頁面載入時判斷連結類型
-const urlParams = new URLSearchParams(window.location.search);
-const type = urlParams.get('type');
-
-window.addEventListener('DOMContentLoaded', () => {
-  if (type !== 'recovery') {
-    // 若不是從重設密碼信點進來，就導回登入頁
-    window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-  } else {
-    // 顯示 reset 表單
-    document.getElementById('reset-section').style.display = '';
-  }
-});
-
-// 顯示/隱藏密碼
-function togglePw(inputId, btn) {
-  const input = document.getElementById(inputId);
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.textContent = '(=ω=)';
-  } else {
-    input.type = 'password';
-    btn.textContent = '(ΦωΦ)';
-  }
-}
-
-    function setLoading(isLoading) {
-      document.getElementById('reset-btn').classList.toggle('loading', isLoading);
+    // 顯示/隱藏密碼
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '(=ω=)';
+      } else {
+        input.type = 'password';
+        btn.textContent = '(ΦωΦ)';
+      }
     }
 
+    // 抓網址 type（支援 query 與 hash）
+    function getTypeFromURL() {
+      const queryType = new URLSearchParams(window.location.search).get('type');
+      if (queryType) return queryType;
+      const hashType = new URLSearchParams(window.location.hash.slice(1)).get('type');
+      return hashType;
+    }
+
+    // 等 DOM 載入後判斷是否允許顯示重設頁
+    window.addEventListener('DOMContentLoaded', async () => {
+      const type = getTypeFromURL();
+      if (type !== 'recovery') {
+        window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+        return;
+      }
+
+      // 顯示表單
+      document.getElementById('reset-section').style.display = '';
+
+      // 檢查 session 有沒有成功登入
+      try {
+        await new Promise(r => setTimeout(r, 100)); // 等 supabase 載入 token
+        const { data } = await supabase.auth.getUser();
+        if (!data || !data.user) {
+          document.getElementById('reset-msg').textContent = '連結已過期，請重新申請。';
+          setTimeout(() => {
+            window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+          }, 2000);
+        }
+      } catch {
+        document.getElementById('reset-msg').textContent = '登入驗證失敗。';
+        setTimeout(() => {
+          window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+        }, 2000);
+      }
+    });
+
+    // 密碼重設處理
     async function handleResetPassword(e) {
-      if (e) e.preventDefault();
+      e.preventDefault();
       const newPassword = document.getElementById('new-password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
       const msgDiv = document.getElementById('reset-msg');
@@ -79,40 +99,23 @@ function togglePw(inputId, btn) {
         return;
       }
 
-      setLoading(true);
-      let sessionUser = null;
-      try {
-        await new Promise(r => setTimeout(r, 100));
-        const { data } = await supabase.auth.getUser();
-        sessionUser = data && data.user;
-      } catch (_) {
-        sessionUser = null;
-      }
-
-      if (!sessionUser) {
-        msgDiv.textContent = '重設連結已失效，請重新申請。將自動回登入頁...';
-        setLoading(false);
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
-        return;
-      }
+      document.getElementById('reset-btn').classList.add('loading');
 
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) {
-        msgDiv.textContent = '密碼重設失敗: ' + error.message + '。將自動回登入頁...';
-        setLoading(false);
+        msgDiv.textContent = '密碼重設失敗: ' + error.message;
+        document.getElementById('reset-btn').classList.remove('loading');
         setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
+          window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+        }, 2000);
         return;
       }
 
-      msgDiv.textContent = '密碼重設成功，請重新登入！';
-      setLoading(false);
+      msgDiv.textContent = '密碼重設成功，將導回登入頁！';
+      document.getElementById('reset-btn').classList.remove('loading');
       setTimeout(() => {
-        window.location.href = "login.html";
-      }, 1300);
+        window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+      }, 1500);
     }
   </script>
 </body>
