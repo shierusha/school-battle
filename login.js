@@ -1,6 +1,6 @@
 // ====== Supabase 設定 ======
 const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz...'; // 你原本的 KEY
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz...'; // 你的原 key
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==== 密碼顯示/隱藏（貓咪眼睛）====
@@ -32,15 +32,15 @@ function showLogin(msg = '') {
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
 
-  // ✅ 自動填入上次註冊信箱
-  const emailField = document.getElementById('login-email');
-  if (emailField) {
+  // ✅ 等 DOM 轉換後再填入 email
+  setTimeout(() => {
+    const emailField = document.getElementById('login-email');
     const savedEmail = localStorage.getItem('last_signup_email');
-    if (savedEmail) {
+    if (emailField && savedEmail) {
       emailField.value = savedEmail;
       localStorage.removeItem('last_signup_email');
     }
-  }
+  }, 50);
 
   if (msg) {
     document.getElementById('login-msg').textContent = msg;
@@ -104,7 +104,7 @@ async function signUp() {
   // ✅ 記住 email，登入時自動填入
   localStorage.setItem('last_signup_email', email);
 
-  // 嘗試寫入 players 資料表
+  // 嘗試寫入 players 表
   let insertError;
   try {
     ({ error: insertError } = await supabase.from('players').insert({
@@ -219,7 +219,7 @@ async function handleForgot(e) {
   if (error) {
     msgDiv.textContent = '寄送失敗: ' + error.message;
   } else {
-    msgDiv.textContent = '如果您有註冊，密碼重設信已寄出';
+    msgDiv.textContent = '如果你已註冊，我們已寄出密碼重設信，請查收信箱。';
     msgDiv.className = 'msg success';
   }
 }
