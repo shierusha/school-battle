@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>謝爾夏</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="center">
+    <h2>謝爾夏｜帳號驗證</h2>
+
+    <!-- ⏳ loading -->
+    <div id="loading-section">正在驗證中... 請稍候喵 (ฅ´ω`ฅ)</div>
+
+    <!-- ✅ signup 驗證成功 -->
+    <div id="signup-section" style="display:none">
+      <p class="msg success">信箱驗證成功，請返回登入畫面！</p>
+      <button onclick="goLogin()">返回登入</button>
+    </div>
+
+    <!-- 🔐 reset password -->
+    <form id="reset-section" style="display:none;" onsubmit="handleResetPassword(event)">
+      <label for="new-password">新密碼</label>
+      <div class="input-group">
+        <input type="password" id="new-password" placeholder="請輸入新密碼" required>
+        <span class="toggle-pw" onclick="togglePw('new-password', this)" title="顯示/隱藏新密碼">(ΦωΦ)</span>
+      </div>
+      <label for="confirm-password">請再次輸入新密碼</label>
+      <div class="input-group">
+        <input type="password" id="confirm-password" placeholder="再次輸入新密碼" required>
+        <span class="toggle-pw" onclick="togglePw('confirm-password', this)" title="顯示/隱藏密碼">(ΦωΦ)</span>
+      </div>
+      <button type="submit" id="reset-btn">送出</button>
+      <div class="msg" id="reset-msg"></div>
+    </form>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '(=ω=)';
+      } else {
+        input.type = 'password';
+        btn.textContent = '(ΦωΦ)';
+      }
+    }
+
+    function getTypeFromURL() {
+      const queryType = new URLSearchParams(window.location.search).get('type');
+      if (queryType) return queryType;
+      const hashType = new URLSearchParams(window.location.hash.slice(1)).get('type');
+      return hashType;
+    }
+
+    function goLogin() {
+      window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
+    }
+    
+const hashParams = new URLSearchParams(window.location.hash.slice(1));
+if (hashParams.get('error_code') === 'otp_expired') {
+  document.body.innerHTML = `
+    <div class="center">
+      <h2>連結已失效</h2>
+      <p class="msg">這封驗證信已過期或無效，請回登入頁重新操作。</p>
+      <button onclick="location.href='login.html'">返回登入</button>
+    </div>
+  `;
+}
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const access_token = hashParams.get('access_token');
+      const refresh_token = hashParams.get('refresh_token');
+      const type = getTypeFromURL();
+
+      // 顯示 loading
+      document.getElementById('loading-section').style.display = 'block';
+
+      if (access_token && refresh_token) {
+        try {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        } catch (err) {
+          console.warn('登入失敗:', err);
+        }
+      }
+
+      await new Promise(r => setTimeout(r, 500)); // loading 顯示一下下
+
+      if (type === 'recovery') {
+        const { data } = await supabase.auth.getUser();
+        if (!data?.user) {
+          document.getElementById('loading-section').textContent = '連結已過期或無效，請重新申請。';
+          setTimeout(goLogin, 2000);
+          return;
+        }
+        document.getElementById('loading-section').style.display = 'none';
+        document.getElementById('reset-section').style.display = 'block';
+      } else if (type === 'signup') {
+        document.getElementById('loading-section').style.display = 'none';
+        document.getElementById('signup-section').style.display = 'block';
+      } else {
+        document.getElementById('loading-section').textContent = '連結參數錯誤，請從信箱重新點擊。';
+      }
+    });
+
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const msgDiv = document.getElementById('reset-msg');
+      msgDiv.textContent = '';
+
+      if (!newPassword || newPassword.length < 6) {
+        msgDiv.textContent = '請輸入至少6位數新密碼';
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        msgDiv.textContent = '兩次密碼輸入不一致';
+        return;
+      }
+
+      document.getElementById('reset-btn').classList.add('loading');
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+      if (error) {
+        msgDiv.textContent = '密碼重設失敗: ' + error.message;
+        document.getElementById('reset-btn').classList.remove('loading');
+        setTimeout(goLogin, 2000);
+        return;
+      }
+
+      msgDiv.textContent = '密碼重設成功，將導回登入頁！';
+      document.getElementById('reset-btn').classList.remove('loading');
+      setTimeout(goLogin, 1500);
+    }
+  </script>
+</body>
+</html>
 
