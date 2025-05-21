@@ -10,16 +10,18 @@ function togglePw(inputId, btn) {
   btn.textContent = input.type === 'password' ? '(ΦωΦ)' : '(=ω=)';
 }
 
-// 表單切換
+// 切換註冊表單
 function showSignUp() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = '';
   document.getElementById('forgot-form').style.display = 'none';
-  document.getElementById('login-msg').textContent = '';
-  document.getElementById('signup-msg').textContent = '';
-  document.getElementById('forgot-msg').textContent = '';
+  clearMsgs();
 }
+
+// 切換登入表單
 function showLogin(msg = '') {
+  // 防呆：不要把 event 物件當作 msg
+  if (typeof msg === 'object' && msg !== null) msg = '';
   document.getElementById('login-form').style.display = '';
   document.getElementById('signup-form').style.display = 'none';
   document.getElementById('forgot-form').style.display = 'none';
@@ -28,10 +30,17 @@ function showLogin(msg = '') {
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
 }
+
+// 切換忘記密碼表單
 function showForgot() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('signup-form').style.display = 'none';
   document.getElementById('forgot-form').style.display = '';
+  clearMsgs();
+}
+
+// 清除所有訊息
+function clearMsgs() {
   document.getElementById('login-msg').textContent = '';
   document.getElementById('signup-msg').textContent = '';
   document.getElementById('forgot-msg').textContent = '';
@@ -121,4 +130,7 @@ async function handleForgot(e) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', showLogin);
+// 最正確的初始化方式，絕對不出 bug
+document.addEventListener('DOMContentLoaded', function () {
+  showLogin();
+});
