@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>謝爾夏｜登入/註冊</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
@@ -12,9 +11,8 @@
   <div class="center">
     <h2>謝爾夏<br>登入/註冊</h2>
 
-    <!-- 登入表單 -->
+    <!-- 登入 -->
     <form id="login-form" autocomplete="on">
-      <div class="form-title">登入</div>
       <label for="login-email">電子信箱</label>
       <input type="email" id="login-email" name="email" placeholder="Email" autocomplete="username">
       <label for="login-password">密碼</label>
@@ -28,9 +26,8 @@
       <div class="msg" id="login-msg"></div>
     </form>
 
-    <!-- 註冊表單 -->
+    <!-- 註冊 -->
     <form id="signup-form" style="display:none" autocomplete="on">
-      <div class="form-title">註冊</div>
       <label for="signup-username">玩家名稱</label>
       <input type="text" id="signup-username" placeholder="玩家名稱" autocomplete="nickname">
       <label for="signup-email">電子信箱</label>
@@ -45,9 +42,8 @@
       <div class="msg" id="signup-msg"></div>
     </form>
 
-    <!-- 忘記密碼表單 -->
+    <!-- 忘記密碼 -->
     <form id="forgot-form" style="display:none" onsubmit="handleForgot(event)" autocomplete="on">
-      <div class="form-title">重設密碼</div>
       <label for="forgot-email">請輸入你的電子信箱</label>
       <input type="email" id="forgot-email" name="email" placeholder="Email" autocomplete="username">
       <button type="submit" id="forgot-btn">寄送重設信</button>
@@ -55,7 +51,6 @@
       <div class="msg" id="forgot-msg"></div>
     </form>
   </div>
-
   <script src="login.js"></script>
 </body>
 </html>
