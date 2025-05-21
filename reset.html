@@ -28,12 +28,10 @@
   </div>
 
   <script>
-    // Supabase 設定
     const SUPABASE_URL = 'https://jtijaauoeqpyyoicpcor.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWphYXVvZXFweXlvaWNwY29yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzIwOTQsImV4cCI6MjA2MjIwODA5NH0.2wwDuo8wMtmNIPaidTsTOjlZeqngq7g3w32uTXn3VM0';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 顯示/隱藏密碼
     function togglePw(inputId, btn) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -45,7 +43,6 @@
       }
     }
 
-    // 抓網址 type（支援 query 與 hash）
     function getTypeFromURL() {
       const queryType = new URLSearchParams(window.location.search).get('type');
       if (queryType) return queryType;
@@ -53,36 +50,39 @@
       return hashType;
     }
 
-    // 等 DOM 載入後判斷是否允許顯示重設頁
     window.addEventListener('DOMContentLoaded', async () => {
+      // Step 1: 嘗試從 hash 拿 token → 設定 session
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const access_token = hashParams.get('access_token');
+      const refresh_token = hashParams.get('refresh_token');
+      if (access_token && refresh_token) {
+        try {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        } catch (err) {
+          console.error('登入失敗:', err);
+        }
+      }
+
+      // Step 2: 判斷 type
       const type = getTypeFromURL();
       if (type !== 'recovery') {
         window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
         return;
       }
 
-      // 顯示表單
+      // Step 3: 顯示畫面
       document.getElementById('reset-section').style.display = '';
 
-      // 檢查 session 有沒有成功登入
-      try {
-        await new Promise(r => setTimeout(r, 100)); // 等 supabase 載入 token
-        const { data } = await supabase.auth.getUser();
-        if (!data || !data.user) {
-          document.getElementById('reset-msg').textContent = '連結已過期，請重新申請。';
-          setTimeout(() => {
-            window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
-          }, 2000);
-        }
-      } catch {
-        document.getElementById('reset-msg').textContent = '登入驗證失敗。';
+      // Step 4: 檢查 session 成功否
+      const { data } = await supabase.auth.getUser();
+      if (!data || !data.user) {
+        document.getElementById('reset-msg').textContent = '連結已過期或無效，請重新申請。';
         setTimeout(() => {
           window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
         }, 2000);
       }
     });
 
-    // 密碼重設處理
     async function handleResetPassword(e) {
       e.preventDefault();
       const newPassword = document.getElementById('new-password').value;
@@ -100,8 +100,8 @@
       }
 
       document.getElementById('reset-btn').classList.add('loading');
-
       const { error } = await supabase.auth.updateUser({ password: newPassword });
+
       if (error) {
         msgDiv.textContent = '密碼重設失敗: ' + error.message;
         document.getElementById('reset-btn').classList.remove('loading');
