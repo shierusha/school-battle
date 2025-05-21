@@ -64,7 +64,18 @@
     function goLogin() {
       window.location.href = "https://sheruka-game.github.io/school-battle/login.html";
     }
-
+    
+const hashParams = new URLSearchParams(window.location.hash.slice(1));
+if (hashParams.get('error_code') === 'otp_expired') {
+  document.body.innerHTML = `
+    <div class="center">
+      <h2>連結已失效</h2>
+      <p class="msg">這封驗證信已過期或無效，請回登入頁重新操作。</p>
+      <button onclick="location.href='login.html'">返回登入</button>
+    </div>
+  `;
+}
+    
     window.addEventListener('DOMContentLoaded', async () => {
       const hashParams = new URLSearchParams(window.location.hash.slice(1));
       const access_token = hashParams.get('access_token');
