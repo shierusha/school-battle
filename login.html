@@ -10,10 +10,10 @@
 </head>
 <body>
   <div class="center">
-    <h2>謝爾夏</h2>
+    <h2>謝爾夏<br>登入/註冊</h2>
 
     <!-- 登入表單 -->
-    <form id="login-form">
+    <form id="login-form" autocomplete="on">
       <div class="form-title">登入</div>
       <label for="login-email">電子信箱</label>
       <input type="email" id="login-email" name="email" placeholder="Email" autocomplete="username">
@@ -29,7 +29,7 @@
     </form>
 
     <!-- 註冊表單 -->
-    <form id="signup-form" style="display:none">
+    <form id="signup-form" style="display:none" autocomplete="on">
       <div class="form-title">註冊</div>
       <label for="signup-username">玩家名稱</label>
       <input type="text" id="signup-username" placeholder="玩家名稱" autocomplete="nickname">
@@ -46,7 +46,7 @@
     </form>
 
     <!-- 忘記密碼表單 -->
-    <form id="forgot-form" style="display:none" onsubmit="handleForgot(event)">
+    <form id="forgot-form" style="display:none" onsubmit="handleForgot(event)" autocomplete="on">
       <div class="form-title">重設密碼</div>
       <label for="forgot-email">請輸入你的電子信箱</label>
       <input type="email" id="forgot-email" name="email" placeholder="Email" autocomplete="username">
