@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="https://shierusha.github.io/school-battle/teachers/th.css">
 </head>
 <body>
-  
+
  
 <div class="flip-card" id="flipCard">
 <div class="flip-card-inner">
-      <!-- 正面BG ------------------------------------->
+      <!-- 正面BG ------------------------------------->  
 <div class="flip-card-front">
 <div  class="container-16-9">
-  <img class="bg-img" src="https://shierusha.github.io/school-battle/teachers/img/bg.jpg" alt="background" />
+  <img class="bg-img" src="https://shierusha.github.io/school-battle/teachers/img/1.webp" alt="background" />
 
 <!-- 正面 ----------------------------------->
 <div class="imgarea"> 
@@ -54,7 +54,7 @@
 
     <div class="info-box" style="height:15%;width: 49%;">
       <span class="info-label">個性</span>
-      <span class="info-value"  style="margin-top: 0.45em;">非常......騷?
+      <span class="info-value" >非常......騷?
 討厭暴力
 行為舉止夾帶著一股優雅的氣質
       </span>
@@ -78,7 +78,8 @@
     </div> 
     <div class="info-box" style="height:7%;border-radius:5px 5px 0px 0px;">
       <span class="info-label">角色備註</span>
-      <span style="color: #495079; font-weight: 700;  letter-spacing: 0.05em; padding-left: 0.3em; ">裏設定</span>
+      <span style="color: #495079; font-weight: 700;  letter-spacing: 0.05em; padding-left: 0.3em;  align-self: center;
+ ">裏設定</span>
 
     </div>
 
@@ -89,12 +90,8 @@
 
 
       </span>
-  <button class="show-more-btn" style="display:none;">...MORE</button>
-
-
+  <button class="show-more-btn" data-title="角色備註/裏設定">...MORE</button>
     </div>  
-
-
   </div>
 
   <div class="row-1" style="right:0; height: 90%;">
@@ -112,7 +109,8 @@
     <div class="info-box" style="height:7%;border-radius:5px 5px 0px 0px;">
       <span class="info-label">背景故事</span>
       <span style="color: #495079;
-  font-weight: 700;  letter-spacing: 0.05em; padding-left: 0.3em; ">設定</span>
+  font-weight: 700;  letter-spacing: 0.05em; padding-left: 0.3em;  align-self: center;
+ ">設定</span>
     </div>
     <div class="info-box" style="height:49.8%;margin-top:-2.8%;border-radius:0px 0px 5px 5px;">
       <span class="info-value" style="margin-top: 0.35em;">15歲時被年輕的騎士團長所幫助
@@ -155,7 +153,8 @@
 為了生活
 因緣際會來到學校當數學老師
       </span>
-  <button class="show-more-btn" style="display:none;">...MORE</button>
+  <button class="show-more-btn" data-title="背景故事/設定">...MORE</button>
+
     </div> 
   </div>
     
@@ -163,19 +162,16 @@
           <!-- 正面 ----------------------------------->
 </div>
 </div>
-
 </div>
 </div>
 
 
-
-<div id="longtext-modal" class="modal" style="display:none;">
+<div id="info-modal" class="modal-overlay" style="display:none;">
   <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <div class="modal-body"></div>
+    <div class="modal-header" id="info-modal-title">標題</div>
+    <div class="modal-body" id="info-modal-body"></div>
   </div>
 </div>
-
 
 
 <button onclick="changeBg()" style="position: fixed;
@@ -187,7 +183,7 @@
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 6px;
-  cursor: pointer;">切換背景</button>
+  cursor: pointer;">切換卡片背景</button>
 
 
 
@@ -234,13 +230,63 @@ window.addEventListener('load', fitAll);
 
 
 
+  // 更多
+// 判斷 info-value 超過 13 字才顯示 ...MORE
+function checkLongTextByCharCount(N = 13) {
+  document.querySelectorAll('.info-box').forEach(box => {
+    const value = box.querySelector('.info-value');
+    const btn = box.querySelector('.show-more-btn');
+    if (!value || !btn) return;
+    if (value.innerText.trim().length > N) {
+      btn.style.display = 'block';
+      btn.onclick = function() {
+        // 標題優先抓 info-label, 沒有就用 data-title (button自訂)，最後才 "內容"
+        const label = box.querySelector('.info-label')?.innerText || this.dataset.title || "內容";
+        showInfoModal(label, value.innerHTML);
+      }
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+}
+// 初次和視窗大小變動時都要判斷一次
+window.addEventListener('DOMContentLoaded', () => checkLongTextByCharCount(13));
+window.addEventListener('resize', () => checkLongTextByCharCount(13));
+
+
+// 彈跳視窗相關
+function showInfoModal(title, content) {
+  document.getElementById('info-modal-title').innerText = title;
+  document.getElementById('info-modal-body').innerHTML = content;
+  document.getElementById('info-modal').style.display = 'flex';
+}
+// 點背景關閉彈窗
+document.getElementById('info-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+
 // 多張背景圖網址
   const bgList = [
-    "https://shierusha.github.io/create-student/imgs/background.png",
+    "https://shierusha.github.io/school-battle/teachers/img/1.webp",
     "https://shierusha.github.io/school-battle/teachers/img/2.webp",
     "https://shierusha.github.io/school-battle/teachers/img/3.webp",
     "https://shierusha.github.io/school-battle/teachers/img/4.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/5.webp"
+    "https://shierusha.github.io/school-battle/teachers/img/5.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/6.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/7.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/8.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/9.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/10.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/11.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/12.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/13.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/14.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/15.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/16.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/17.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/18.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/19.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/20.webp"
   ];
 
 let bgIndex = 0;
@@ -250,6 +296,7 @@ function changeBg() {
   bgIndex = (bgIndex + 1) % bgList.length;
   bgImg.src = bgList[bgIndex];
 }
+
 
 </script>
 
