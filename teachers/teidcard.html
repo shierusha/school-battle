@@ -164,6 +164,9 @@
 </div>
 </div>
 
+</div>
+</div>
+
 
 
 <div id="longtext-modal" class="modal" style="display:none;">
@@ -172,6 +175,20 @@
     <div class="modal-body"></div>
   </div>
 </div>
+
+
+
+<button onclick="changeBg()" style="position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999; /* 保證在最上層 */
+  padding: 8px 20px;
+  font-size: 1.1em;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;">切換背景</button>
+
 
 
 
@@ -214,6 +231,25 @@ function fitAll() {
 window.addEventListener('DOMContentLoaded', fitAll);
 window.addEventListener('resize', fitAll);
 window.addEventListener('load', fitAll);
+
+
+
+// 多張背景圖網址
+  const bgList = [
+    "https://shierusha.github.io/create-student/imgs/background.png",
+    "https://shierusha.github.io/school-battle/teachers/img/2.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/3.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/4.webp",
+    "https://shierusha.github.io/school-battle/teachers/img/5.webp"
+  ];
+
+let bgIndex = 0;
+function changeBg() {
+  const bgImg = document.querySelector('.bg-img');
+  if (!bgImg) return;
+  bgIndex = (bgIndex + 1) % bgList.length;
+  bgImg.src = bgList[bgIndex];
+}
 
 </script>
 
