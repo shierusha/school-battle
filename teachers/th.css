@@ -200,9 +200,9 @@ body::before {
 .info-box {
   display: flex;
   align-items: flex-start;
-  position: relative; /* 讓子元素能絕對定位 */
-
-  background: rgba(173,216,230,0.8);
+  position: relative; /* 讓子元素能絕對定位
+  background: rgba(173,216,230,0.8); */
+  background: rgba(255,255,255,0.8);
   border-radius: 5px;
   box-shadow: 0 2px 12px #0001;
   font-size: unset;
@@ -237,6 +237,7 @@ body::before {
 .info-value {
   display: block;
   margin-left: 0.5em;
+   margin-top: 0.15em;
   color: #222;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -250,7 +251,7 @@ white-space: pre-line;
   right: 0;
   bottom: 0;
   height: 1.2en;   
-  background:#bcd6e7;/* 跟 info-box 背景一致 */
+  background:#FFF;/* 確認後修改 */
   border: none;
   border-radius: 5pt;
   font-weight: bold;
@@ -263,6 +264,66 @@ white-space: pre-line;
 }
 .show-more-btn:hover {
   color: #b30000;
+}
+
+
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modal-fadein-bg 0.25s;
+}
+@keyframes modal-fadein-bg {
+  from { background: rgba(0,0,0,0);}
+  to   { background: rgba(0,0,0,0.45);}
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0003;
+  width: 420px;     /* 你要固定寬高可改百分比，如 width:38vw; height:52vh; */
+  max-width: 93vw;
+  height: 340px;    /* 建議用 vh 也可以 */
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-pop 0.32s cubic-bezier(.42,1.4,.51,1.01);
+}
+@keyframes modal-pop {
+  from { opacity: 0; transform: scale(0.92);}
+  to   { opacity: 1; transform: scale(1);}
+}
+
+.modal-header {
+  background: #336591;
+  color: #fff;
+  border-radius: 18px 18px 0 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 13px 0 11px 28px;
+  letter-spacing: 0.07em;
+  flex: 0 0 auto;
+}
+
+.modal-body {
+  flex: 1 1 0;
+  background: #f2fcff;
+  color: #336591;
+  font-size: 1.08em;
+  padding: 18px 24px 16px 24px;
+  overflow-y: auto;
+  line-height: 1.6;
+  word-break: break-all;
+white-space: pre-line;
+font-weight: 600; 
+
 }
 
 
