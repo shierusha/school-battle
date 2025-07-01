@@ -8,11 +8,13 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.3); /* 半透明白色 */
+  background: rgba(255,255,255,0.3); /* 白色半透明 */
   z-index: 0;
   pointer-events: none;
 }
-
+body.dark-bg::before {
+  background: rgba(0,0,0,0.3); /* 黑色半透明 */
+}
 
   /*翻轉區 */
     .flip-card {
