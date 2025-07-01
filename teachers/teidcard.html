@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="https://shierusha.github.io/school-battle/teachers/th.css">
 </head>
 <body>
-
  
 <div class="flip-card" id="flipCard">
 <div class="flip-card-inner">
@@ -187,8 +186,16 @@
 
 
 
-
-
+<button id="toggleBgBtn" style="position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 9999; /* 保證在最上層 */
+  padding: 8px 20px;
+  font-size: 1.1em;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;">切換背景顏色</button>
   
 <script>
 function setNameFontSize(selector, maxChars) {
@@ -297,7 +304,9 @@ function changeBg() {
   bgImg.src = bgList[bgIndex];
 }
 
-
+document.getElementById('toggleBgBtn').onclick = function() {
+  document.body.classList.toggle('dark-bg');
+}
 </script>
 
 </body>
