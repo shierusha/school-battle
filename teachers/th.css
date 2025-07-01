@@ -1,0 +1,270 @@
+body {
+      background: url('https://shierusha.github.io/create-student/imgs/citybg.png') center center no-repeat;
+      background-size: cover;
+      min-height: 100vh;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.3); /* 半透明白色 */
+  z-index: 0;
+  pointer-events: none;
+}
+
+
+  /*翻轉區 */
+    .flip-card {
+     max-width: 75vw;
+      aspect-ratio: 16/9;
+      margin: 10pt auto;
+      overflow: hidden;   /*超出部分隱藏起來 */
+      border-radius: 16px;
+      box-shadow: 0 0 24px #0004;
+      max-height: 80vh; 
+  position: relative;
+  display: flex;
+  align-items: stretch;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      max-height: 80vh;
+
+      transition: transform 1.5s cubic-bezier(.47,0,.39,1.47);
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      box-shadow: 0 0 24px #0004;
+      overflow: hidden;
+      backface-visibility: hidden;
+      background: #fff;
+    }
+    .flip-card-front {
+      z-index: 2;
+    }
+
+    /* 卡片底 */
+    .container-16-9 {
+      position: relative;
+      width: 100%;
+     height: 100%; 
+      aspect-ratio: 16/9;
+
+      overflow: hidden;   /*超出部分隱藏起來 */
+      border-radius: 16px;
+      box-shadow: 0 0 24px #0004;
+    }
+
+    .bg-img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      left: 0; top: 0;
+      z-index: 1;
+    }
+
+ /* 角色圖片區 */
+.imgarea {
+  position: absolute; 
+  top: 10%;
+  width: 45%;
+  height: 90%;
+  overflow: hidden;
+  z-index: 4;
+ 
+
+}
+
+.char-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+ /* 角色姓名區 */
+.bigname-box {
+  position: absolute;
+  left: 3.5%;
+  top: 15%;
+  height: 80%;
+  width:4.5%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  z-index: 5;
+  font-weight: 450;
+}
+
+
+.bigname {
+  width: 100%;
+  bottom: 0%;
+  left: 0%;
+  letter-spacing: 0.1em;
+}
+
+
+.littlename{
+  width: 100%;
+  bottom: 0%;
+  left: 0%;
+  letter-spacing: 0.12em;        
+}
+
+.littlename-box{
+  position: absolute;
+
+  bottom: 2.5%;
+  left:8.2%;
+  width: 3.45%;
+  height: 45%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  z-index: 5;
+  font-weight: 400;
+}
+
+.name-box {
+  position: absolute;
+  background: rgba(61, 162, 173, 0.8);
+  border-radius: 5px;
+  color: #fff;
+
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+
+
+  flex-direction: column;
+  justify-content: flex-end; /* 貼底 */
+
+  font-family: "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+  box-shadow: 0 2px 10px #0002;
+  text-align: center;
+
+  padding: 0.3em 0;   
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow: hidden;
+
+  display: flex;
+  line-height: 1.15;
+  z-index: 5;
+}
+
+/* 角色文字框區-中間 */
+.row {
+  position: absolute; 
+  top: 12%;
+  right: 3.5%;
+  width: 65%;
+  height: 80%;
+  z-index: 5;
+}
+.row-1 {
+  position: absolute;
+  top: 0;
+  width: 49%;
+  height: 100%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5%; 
+}
+
+
+/* 文字框效果 */
+.info-row {
+  display: flex;
+  gap: 1%;         /* 兩格之間留點空隙，可調整 */
+  width: 100%;
+}
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  position: relative; /* 讓子元素能絕對定位 */
+
+  background: rgba(173,216,230,0.8);
+  border-radius: 5px;
+  box-shadow: 0 2px 12px #0001;
+  font-size: unset;
+  z-index: 5;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0 0.7em;
+}
+
+.info-label {
+  position: relative;
+  align-self: center;
+
+  padding-right: 0.8em;  /* 預留分隔線空間 */
+  color: #495079;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.info-label::after {
+  content: "";
+  position: absolute;
+  right: 0.2em;
+  top: 14%;
+  width: 1.3px;
+  height: 72%;
+  background: #495079;
+  opacity: 0.8;
+  border-radius: 2px;
+}
+
+.info-value {
+  display: block;
+  margin-left: 0.5em;
+  color: #222;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  flex: 1 1 0;
+  overflow-wrap: break-word;
+white-space: pre-line;
+
+}
+.show-more-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 1.2en;   
+  background:#bcd6e7;/* 跟 info-box 背景一致 */
+  border: none;
+  border-radius: 5pt;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0 1.2em;
+  font-size: 0.75em;
+  transition: background 0.2s;
+/* JS   display: none; 控制顯示 */
+}
+.show-more-btn:hover {
+  color: #b30000;
+}
+
+
+
+
