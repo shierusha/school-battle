@@ -2,8 +2,8 @@ window.teachers = {
   papa: {
     bigname: "帕洛斯・特帕爾",
     littlename: "帕帕",
-    img: "https://shierusha.github.io/school-battle/teachers/img/papa.png",
-    bg: "https://shierusha.github.io/school-battle/teachers/img/1.webp",
+    img: "img/papa.png",
+    bg: "img/18.webp",
     info: {
       "陣營": "白色陣營",
       "種族": "團長大人的愛",
@@ -100,7 +100,7 @@ test: {
     bigname: "中文名子(最多10個字)",
     littlename: "對戲顯示短名稱 (可不填)",
     img: "img/papa.png",
-    bg: "img/4.webp",
+    bg: "img/18.webp",
     info: {
       "陣營": "白色/黑色 陣營",
       "種族": "不可以超過9個字",
