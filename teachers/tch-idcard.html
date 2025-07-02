@@ -284,6 +284,15 @@ function applyTeacherData() {
 
 window.addEventListener("DOMContentLoaded", applyTeacherData);
 
+//黑白濾境
+window.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById('toggleBgBtn');
+  if (toggleBtn) {
+    toggleBtn.onclick = function() {
+      document.body.classList.toggle('dark-bg');
+    }
+  }
+});
 
 </script>
 
