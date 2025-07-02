@@ -173,32 +173,6 @@
   </div>
 </div>
 
-
-<button onclick="changeBg()" style="position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999; /* 保證在最上層 */
-  padding: 8px 20px;
-  font-size: 1.1em;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;">切換卡片背景</button>
-
-
-
-<button id="toggleBgBtn" style="position: fixed;
-  top: 80px;
-  left: 20px;
-  z-index: 9999; /* 保證在最上層 */
-  padding: 8px 20px;
-  font-size: 1.1em;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;">切換背景顏色</button>
-  
-
 <script src="teachers-data.js"></script>
 
 <script>
@@ -311,41 +285,6 @@ function applyTeacherData() {
 window.addEventListener("DOMContentLoaded", applyTeacherData);
 
 
-// 多張背景圖網址
-  const bgList = [
-    "https://shierusha.github.io/school-battle/teachers/img/1.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/2.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/3.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/4.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/5.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/6.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/7.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/8.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/9.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/10.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/11.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/12.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/13.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/14.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/15.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/16.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/17.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/18.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/19.webp",
-    "https://shierusha.github.io/school-battle/teachers/img/20.webp"
-  ];
-
-let bgIndex = 0;
-function changeBg() {
-  const bgImg = document.querySelector('.bg-img');
-  if (!bgImg) return;
-  bgIndex = (bgIndex + 1) % bgList.length;
-  bgImg.src = bgList[bgIndex];
-}
-
-document.getElementById('toggleBgBtn').onclick = function() {
-  document.body.classList.toggle('dark-bg');
-}
 </script>
 
 
