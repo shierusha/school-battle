@@ -92,7 +92,7 @@ yu: {
   bigname: "拉斐爾",
   littlename: "優",
   img: "img/yu.png",
-  bg: "img/19.webp",
+  bg: "img/20.webp",
   useDarkBg: false, // ture 是黑底  false 是白底
   info: {
     "陣營": "白色陣營",
