@@ -4,7 +4,7 @@ window.teachers = {
     littlename: "帕帕",
     img: "img/papa.png",
     bg: "img/18.webp",
-    useDarkBg: true, // ture 是黑底  false 是白底
+    useDarkBg: false, // ture 是黑底  false 是白底
     info: {
       "陣營": "白色陣營",
       "種族": "團長大人的愛",
