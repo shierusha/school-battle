@@ -259,6 +259,12 @@ function applyTeacherData() {
   const teacher = window.teachers?.[teacherId];
   if (!teacher) return;
 
+  // 自動控制背景濾鏡
+  if (teacher.useDarkBg) {
+    document.body.classList.add("dark-bg");
+  } else {
+    document.body.classList.remove("dark-bg");
+  }
   // 套圖片與名字
   document.querySelector(".char-img").src = teacher.img;
   document.querySelector(".bg-img").src = teacher.bg;
