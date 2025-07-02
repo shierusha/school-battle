@@ -4,6 +4,7 @@ window.teachers = {
     littlename: "帕帕",
     img: "img/papa.png",
     bg: "img/18.webp",
+    useDarkBg: true, // ture 是黑底  false 是白底
     info: {
       "陣營": "白色陣營",
       "種族": "團長大人的愛",
@@ -69,6 +70,8 @@ window.teachers = {
   littlename: "簡稱（可不填）",
   img: "img/papa.png",
   bg: "img/18.webp",
+  useDarkBg: true/false , // ture 是黑底  false 是白底
+
   info: {
     "陣營": "白色/黑色 陣營",
     "種族": "最多9字",
@@ -91,6 +94,7 @@ test: {
   littlename: "簡稱（可不填）",
   img: "img/papa.png",
   bg: "img/18.webp",
+  useDarkBg: true , // ture 是黑底  false 是白底
   info: {
     "陣營": "白色/黑色 陣營",
     "種族": "最多9字",
