@@ -369,6 +369,7 @@ pointer-events: none;
   overflow-y: auto;
   word-break: break-all;  /* or break-word; 都可以 */
   max-height: 240px;      /* 依照 modal 高度調整 */
+  white-space: pre-line;
 }
 
 
