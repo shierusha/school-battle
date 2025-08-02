@@ -22,6 +22,14 @@ h2 {
   font-weight: 700;
   letter-spacing: 1px;
 }
+.title-underline {
+  width: 80%;
+  height: 4px;
+  background: #1767a0;
+  border-radius: 2px;
+  margin: 0 auto 1.8em auto;
+  opacity: 0.88;
+}
 .container {
   max-width: 950px;
   margin: auto;
@@ -32,30 +40,40 @@ h2 {
   z-index: 1;
   position: relative;
 }
+.msg { min-height: 1.5em; margin-bottom: 0.8em; }
+
+/* ---- 卡片排版：每行2張，手機1張 ---- */
 .student-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2.3rem 1.3rem;
   margin-top: 1.5em;
 }
+
+/* ---- 卡片本體與切一半橫排 ---- */
 .student-card {
   border-radius: 1.1em;
   padding: 1.5em 1.3em 1.2em 1.3em;
   box-shadow: 0 2px 10px #0002;
   min-width: 0;
+  transition: box-shadow .18s;
   background: #eef4f5;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 2.5px solid #212937;
-
+  border: 2.5px solid #212937;  /* 黑色卡片底色外框 */
 }
+.card-b { background: #212937; }
+.card-b .student-name { color: #fff; }
+
+/* 切一半橫排 */
 .card-row {
   display: flex;
   width: 100%;
   height: 100%;
 }
 .card-left, .card-right {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -63,17 +81,19 @@ h2 {
 }
 .card-left {
   border-right: 1px solid rgba(220,220,220,0.18);
-  padding-right: 1.2em;
-  margin-top: 0px;
-  flex: 0 0 150px;
+  padding-right: 1em;
+  margin-top: 10px;
 }
 .card-right {
-  padding-left: 1.3em;
+  padding-left: 1em;
   align-items: flex-start;
-  flex: 1 1 0;
 }
+
+/* ---- 頭像與資訊 ---- */
 .avatar-frame {
-  width: 140px; height: 140px;
+  width: 90%;
+  max-width: 180px;
+  aspect-ratio: 1/1;
   border-radius: 1em;
   overflow: hidden;
   background: #e7e8f3;
@@ -81,7 +101,7 @@ h2 {
   display: flex; align-items: center; justify-content: center;
 }
 .avatar-img {
-  width: 140px; height: 140px; object-fit: cover;
+  width: 100%; height: 100%; object-fit: cover;
   background: #e2e2e2;
   border-radius: 1em;
 }
@@ -106,45 +126,130 @@ h2 {
   margin-bottom: 0.4em;
   color: #143158;
 }
-.btn-link {
-  background: #346689;
+
+/* ---- 按鈕群 ---- */
+.card-btn-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55em;
+}
+.card-btn-group .btn {
+  min-width: 90px;
+  width: 100%;
+  max-width: 220px;
+  margin: 0.18em 0;
+}
+.btn {
+  background: #1767a0;
   color: #fff;
   border: none;
   border-radius: 0.5em;
-  padding: 0.25em 1.1em;
+  padding: 0.3em 0.8em;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1em;
-  transition: background .13s;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 0.13em;
+  margin-right: 0.2em;
+  transition: background .15s;
 }
-.btn-link:hover {
-  background: #234057;
-}
+.btn-edit { background: #21694b; }
+.btn-link { background: #346689; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---- 響應式 ---- */
 @media (max-width: 750px) {
   .container { padding: 1em; }
   .student-list { grid-template-columns: 1fr; }
-  .card-left { flex: 0 0 110px; }
-  .avatar-frame, .avatar-img { width: 110px; height: 110px; }
+  .avatar-frame { max-width: 110px; }
 }
 @media (max-width: 375px) {
   .student-list { grid-template-columns: 1fr; }
   .student-card { padding: 1.2em 0.7em 1em 0.7em; }
   .card-row { flex-direction: column; }
   .card-left, .card-right { padding: 0; border: none; }
-  .avatar-frame, .avatar-img { width: 80px; height: 80px; }
+  .avatar-frame { max-width: 80px; }
 }
 
-    .title-underline {
-  width: 80%;
-  height: 4px;
-  background: #1767a0;
-  border-radius: 2px;
-  margin: 0 auto 1.8em auto;
-  opacity: 0.88;
+/* ----------- Modal 相關 ----------- */
+.modal-bg {
+  display: none;
+  position: fixed;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.22);
+  z-index: 1001;
+  justify-content: center;
+  align-items: center;
 }
+.modal-bg[style*="flex"], .modal-bg[style*="display: flex"] { display: flex !important; }
+.modal {
+  position: relative;
+  background: #fff;
+  border-radius: 1em;
+  max-width: 97vw;
+  min-width: 240px;
+  width: 420px;
+  box-sizing: border-box;
+  padding: 2em 1.5em;
+  box-shadow: 0 4px 24px #0004;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ======= canvas 區 ======= */
+#canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 8 / 9;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+#edit-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 400px;
+  max-height: 450px;
+  display: block;
+  background: #ddd;
+  border-radius: 0.7em;
+}
+#redbox-frame {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 400px;
+  max-height: 450px;
+  pointer-events: none;
+  z-index: 10;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 500px) {
+  .modal {
+    width: 99vw;
+    padding: 1em 0.2em;
+    min-width: 0;
+    max-width: 99vw;
+  }
+  #canvas-wrap {
+    max-width: 99vw;
+    aspect-ratio: 8 / 9;
+  }
+}
+
+.close-btn {
+  position: absolute; top: 0.6em; right: 1em;
+  background: none; border: none; font-size: 1.6em; color: #999; cursor: pointer; z-index: 1001;
+}
+.close-btn:hover { color:#e2583e; }
+.hint { font-size: 0.95em; color: #888; margin-top: 0.7em; }
+
   </style>
 </head>
 <body>
