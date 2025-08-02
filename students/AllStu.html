@@ -47,8 +47,6 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 2.5px solid #212937;
-
 }
 .card-row {
   display: flex;
@@ -56,6 +54,7 @@ h2 {
   height: 100%;
 }
 .card-left, .card-right {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -63,104 +62,98 @@ h2 {
 }
 .card-left {
   border-right: 1px solid rgba(220,220,220,0.18);
-  padding-right: 1.2em;
-  margin-top: 0px;
-  flex: 0 0 150px;
+  padding-right: 1em;
+  margin-top: 10px;
 }
 .card-right {
-  padding-left: 1.3em;
-  align-items: flex-start;
-  flex: 1 1 0;
+  padding-left: 1em;
 }
 .avatar-frame {
-  width: 140px; height: 140px;
+  width: 100%;   /* 新增 */
+  max-width: 180px; /* 更大上限（原本110） */
+  aspect-ratio: 1/1;
   border-radius: 1em;
   overflow: hidden;
   background: #e7e8f3;
-  margin-bottom: 0.5em;
+  margin-bottom: 1em;
   display: flex; align-items: center; justify-content: center;
 }
 .avatar-img {
-  width: 140px; height: 140px; object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   background: #e2e2e2;
-  border-radius: 1em;
+  display: block;
 }
 .student-info {
   width: 100%;
-  text-align: left;
-  padding-top: 0.2em;
+  text-align: center;
 }
 .student-code {
   color: #346689;
-  font-size: 1.1em;
+  font-size: 1.06em;
   font-weight: bold;
-  margin-bottom: 0.28em;
-  letter-spacing: 0.03em;
+  margin-bottom: 0.5em;
+  letter-spacing: 0.08em;
 }
 .student-name {
-  font-size: 1.25em;
+  font-size: 1.15em;
   font-weight: bold;
-  min-height: 2.1em;
+  min-height: 2.7em;
   line-height: 1.2em;
-  letter-spacing: .05em;
-  margin-bottom: 0.4em;
-  color: #143158;
+  word-break: break-all;
+  letter-spacing: .04em;
 }
-.btn-link {
-  background: #346689;
+.card-btn-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55em;
+}
+.card-btn-group .btn {
+  min-width: 90px;
+  width: 100%;
+  max-width: 220px;
+  margin: 0.18em 0;
+}
+.btn {
+  background: #1767a0;
   color: #fff;
   border: none;
   border-radius: 0.5em;
-  padding: 0.25em 1.1em;
+  padding: 0.3em 0.8em;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1em;
-  transition: background .13s;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 0.13em;
+  margin-right: 0.2em;
+  transition: background .15s;
 }
-.btn-link:hover {
-  background: #234057;
-}
+.btn-link { background: #346689; }
 @media (max-width: 750px) {
   .container { padding: 1em; }
   .student-list { grid-template-columns: 1fr; }
-  .card-left { flex: 0 0 110px; }
-  .avatar-frame, .avatar-img { width: 110px; height: 110px; }
 }
 @media (max-width: 375px) {
   .student-list { grid-template-columns: 1fr; }
   .student-card { padding: 1.2em 0.7em 1em 0.7em; }
   .card-row { flex-direction: column; }
   .card-left, .card-right { padding: 0; border: none; }
-  .avatar-frame, .avatar-img { width: 80px; height: 80px; }
-}
-
-    .title-underline {
-  width: 80%;
-  height: 4px;
-  background: #1767a0;
-  border-radius: 2px;
-  margin: 0 auto 1.8em auto;
-  opacity: 0.88;
+  .avatar-frame { margin-bottom: 0.5em; }
 }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>學生名冊</h2>
-<div class="title-underline"></div>
     <div id="student-list" class="student-list"></div>
   </div>
   <script>
-// ====== Supabase設定 ======
 const client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
 
-// ====== 跟你原本一樣的頭像裁切法 ======
+// 你原本的 JS 頭像預覽邏輯
 function getAvatarFromUrl(url, callback) {
   let avatarCanvas = document.createElement('canvas');
   avatarCanvas.width = avatarCanvas.height = 300;
@@ -178,8 +171,9 @@ function getAvatarFromUrl(url, callback) {
   img.src = url;
 }
 
-// ====== 取得已過審學生(有學號) ======
+// 取得全部已過審的學生資料
 async function getAllStudents() {
+  // 只撈已過審且有學號的
   let { data: reviews } = await client.from('student_reviews')
     .select('student_id,status');
   let passedMap = {};
@@ -194,7 +188,7 @@ async function getAllStudents() {
   students = (students || []).filter(s => passedMap[s.student_id]);
   students.sort((a, b) => (+a.student_code) - (+b.student_code));
 
-  // 照片
+  // 取得照片
   let { data: imgs } = await client.from('student_images')
     .select('student_id,image_url')
     .eq('image_type', 'front');
@@ -207,7 +201,7 @@ async function getAllStudents() {
   }));
 }
 
-// ====== 畫出名冊 ======
+// 繪製名冊列表
 function renderStudentList(students) {
   const wrap = document.getElementById('student-list');
   wrap.innerHTML = '';
@@ -215,29 +209,30 @@ function renderStudentList(students) {
     let card = document.createElement('div');
     card.className = "student-card";
 
-    // 左側大頭像
     let avatarDiv = document.createElement('div');
     avatarDiv.className = 'avatar-frame';
     let avatarImg = document.createElement('img');
     avatarImg.className = 'avatar-img';
-    avatarImg.src = "https://fakeimg.pl/300x300?text=No+Photo";
-    // canvas裁切大頭像（你的原始寫法）
-    getAvatarFromUrl(
-      stu.image_url + "?v=" + Date.now(),
-      src => { if(src) avatarImg.src = src; }
-    );
+    // 只用你原本的裁切預覽
+    getAvatarFromUrl(stu.image_url + "?v=" + Date.now(), src => {
+      avatarImg.src = src || "https://fakeimg.pl/300x300?text=No+Photo";
+    });
     avatarDiv.appendChild(avatarImg);
 
-    // 右側資訊
     let infoDiv = document.createElement('div');
     infoDiv.className = 'student-info';
+    // 只抓本名，沒有暱稱
     infoDiv.innerHTML = `
       <div class="student-code">NO. ${stu.student_code}</div>
       <div class="student-name">${stu.name}</div>
-      <a class="btn-link" href="https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}" target="_blank">學生證</a>
+      <div class="card-btn-group">
+        <button class="btn btn-link"
+          onclick="window.open('https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}','_blank')"
+        >學生證</button>
+      </div>
     `;
 
-    // 橫切一半
+    // 一半橫切
     let cardRow = document.createElement('div');
     cardRow.className = 'card-row';
 
@@ -257,9 +252,8 @@ function renderStudentList(students) {
   });
 }
 
-// ====== 初始化 ======
+// 初始化
 getAllStudents().then(renderStudentList);
-
   </script>
 </body>
 </html>
