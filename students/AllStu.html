@@ -314,9 +314,9 @@ function renderStudentList(students) {
     // 右側資訊區（只NO. 學號、本名、學生證按鈕）
     let infoDiv = document.createElement('div');
     infoDiv.className = 'student-info';
-    infoDiv.innerHTML =
-      `<div class="student-name">NO. ${stu.student_code}</div>
-       <div class="student-name">${stu.name}</div>`;
+infoDiv.innerHTML =
+  `<div class="student-code">NO. ${stu.student_code}</div>
+   <div class="student-name">${stu.name}</div>`;
 
     // 學生證按鈕
     let btnGroup = document.createElement('div');
