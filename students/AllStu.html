@@ -1,4 +1,5 @@
 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -7,10 +8,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap" rel="stylesheet">
   <style>
+
 body {
   font-family: 'Noto Sans TC', sans-serif;
-  background: #f4f7fa url('https://shierusha.github.io/create-student/imgs/citybg.png') no-repeat center top;
-  background-size: cover;
+  background: #f4f7fa;
   margin: 0;
   padding: 2rem;
 }
@@ -51,8 +52,6 @@ body {
   flex-direction: column;
   align-items: stretch;
 }
-/* 下方這裡不要動它，其它都用你原本的設定 */
-
 .card-b { background: #212937; }
 .card-b .student-name { color: #fff; }
 
@@ -224,23 +223,33 @@ body {
 }
 .close-btn:hover { color:#e2583e; }
 .hint { font-size: 0.95em; color: #888; margin-top: 0.7em; }
+.hr-blue {
+  width: 80%;
+  height: 4px;
+  background: #1767a0;
+  margin: 0 auto 2em auto;
+  border-radius: 2px;
+  opacity: 0.88;
+}
+.student-card {
+  /* 這行建議直接加到你原本的 .student-card 後面 */
+  box-shadow: 0 2px 10px #0002, 0 0 0 5px rgba(33,41,55,0.5);
+}
   </style>
 </head>
 <body>
   <div class="container">
     <h2>謝爾夏｜學生名冊</h2>
-    <div style="width:80%;height:4px;margin:0.7em auto 0 auto;background:linear-gradient(90deg,#1767a0 80%,transparent 100%);border-radius:3px;"></div>
+    <div class="hr-blue"></div>
     <div id="student-list" class="student-list"></div>
   </div>
-<script>
-// 不用登入，公開讀取全學生名冊
-
+  <script>
 const client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
 
-// 跟你原本一樣的 getAvatarFromUrl
+// ==== 頭像裁切邏輯保留原樣 ====
 function getAvatarFromUrl(url, callback) {
   let avatarCanvas = document.createElement('canvas');
   avatarCanvas.width = avatarCanvas.height = 300;
@@ -258,9 +267,10 @@ function getAvatarFromUrl(url, callback) {
   img.src = url;
 }
 
-// 取得所有通過審核且有學號的學生
+// ==== 只顯示已過審且有學號的學生 ====
 async function getAllStudents() {
-  let { data: reviews } = await client.from('student_reviews').select('student_id,status');
+  let { data: reviews } = await client.from('student_reviews')
+    .select('student_id,status');
   let passedMap = {};
   (reviews||[]).forEach(r => {
     if(r.status === "PASS") passedMap[r.student_id] = true;
@@ -273,7 +283,6 @@ async function getAllStudents() {
   students = (students || []).filter(s => passedMap[s.student_id]);
   students.sort((a, b) => (+a.student_code) - (+b.student_code));
 
-  // 照片
   let { data: imgs } = await client.from('student_images')
     .select('student_id,image_url')
     .eq('image_type', 'front');
@@ -286,17 +295,15 @@ async function getAllStudents() {
   }));
 }
 
-// 渲染名冊
+// ==== 渲染名冊列表 ====
 function renderStudentList(students) {
   const wrap = document.getElementById('student-list');
   wrap.innerHTML = '';
   students.forEach(stu => {
     let card = document.createElement('div');
     card.className = "student-card";
-    // 你要的黑色半透明框線
-    card.style.border = "2px solid rgba(33,41,55,0.5)";
 
-    // 頭像canvas
+    // 左側大頭像
     let avatarDiv = document.createElement('div');
     avatarDiv.className = 'avatar-frame';
     let avatarImg = document.createElement('img');
@@ -308,15 +315,23 @@ function renderStudentList(students) {
     );
     avatarDiv.appendChild(avatarImg);
 
-    // 本名/學號/學生證按鈕
+    // 右側資訊區（只NO. 學號、本名、學生證按鈕）
     let infoDiv = document.createElement('div');
     infoDiv.className = 'student-info';
-    infoDiv.innerHTML = `
-      <div class="student-code">NO. ${stu.student_code}</div>
-      <div class="student-name">${stu.name}</div>
-      <a class="btn-link" href="https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}" target="_blank">學生證</a>
-    `;
+    infoDiv.innerHTML =
+      `<div class="student-name">NO. ${stu.student_code}</div>
+       <div class="student-name">${stu.name}</div>`;
 
+    // 學生證按鈕
+    let btnGroup = document.createElement('div');
+    btnGroup.className = 'card-btn-group';
+    let btnCert = document.createElement('button');
+    btnCert.className = 'btn btn-link';
+    btnCert.innerText = '學生證';
+    btnCert.onclick = ()=>window.open(`https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}`,'_blank');
+    btnGroup.appendChild(btnCert);
+
+    // 卡片排版
     let cardRow = document.createElement('div');
     cardRow.className = 'card-row';
 
@@ -327,6 +342,7 @@ function renderStudentList(students) {
     let cardRight = document.createElement('div');
     cardRight.className = 'card-right';
     cardRight.appendChild(infoDiv);
+    cardRight.appendChild(btnGroup);
 
     cardRow.appendChild(cardLeft);
     cardRow.appendChild(cardRight);
@@ -336,10 +352,7 @@ function renderStudentList(students) {
   });
 }
 
-// 初始化
 getAllStudents().then(renderStudentList);
-
-</script>
+  </script>
 </body>
 </html>
-
