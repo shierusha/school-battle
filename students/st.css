@@ -313,12 +313,15 @@ white-space: pre-line;
 }
 
 .modal-content {
-  background: #fff;
+
+  background: rgb(13 27 77 / 82%);      /* 深藍色 + 70%透明 */
   border-radius: 18px;
-  box-shadow: 0 8px 32px #0003;
-  width: 420px;     /* 你要固定寬高可改百分比，如 width:38vw; height:52vh; */
+  border: 2px solid #1eb5e5;              /* 藍色外框 */
+  box-shadow: 0 0 16px 2px #62f1fe88,     /* 外發光 */
+              0 8px 32px #1eb5e5aa;       /* 藍色下陰影 */
+  width: 500px;
   max-width: 93vw;
-  height: 340px;    /* 建議用 vh 也可以 */
+  height: 340px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -331,30 +334,43 @@ white-space: pre-line;
 }
 
 .modal-header {
-  background: #336591;
+  background: none;
+  padding: 15px 20px 0px 24px;
   color: #fff;
-  border-radius: 18px 18px 0 0;
-  font-size: 1.2em;
+  font-size: 1.5em;
   font-weight: bold;
-  padding: 13px 0 11px 28px;
-  letter-spacing: 0.07em;
-  flex: 0 0 auto;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 4px #000a;
 }
+
+.modal-header::after {
+content: "";
+display: block;
+height: 5px;
+width: 70%;
+margin: 0.5rem 0 0 0;
+border-radius: 2px;
+background: linear-gradient(
+to right,
+ #53e2ff99 65%,
+#53e2ff00 100%
+);
+pointer-events: none;
+
+}
+
 
 .modal-body {
-  flex: 1 1 0;
-  background: #f2fcff;
-  color: #336591;
-  font-size: 1.08em;
-  padding: 18px 24px 16px 24px;
+  color: #fff;
+  padding: 12px 24px 24px 24px;
+  font-size: 1.2em;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px #0008;
   overflow-y: auto;
-  line-height: 1.6;
-  word-break: break-all;
-white-space: pre-line;
-font-weight: 600; 
-  letter-spacing: 0.02em;
-
+  word-break: break-all;  /* or break-word; 都可以 */
+  max-height: 240px;      /* 依照 modal 高度調整 */
 }
+
 
 
 
