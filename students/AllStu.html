@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>學生名冊</title>
+  <title>謝爾夏｜學生名冊</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,16 +41,12 @@ h2 {
   position: relative;
 }
 .msg { min-height: 1.5em; margin-bottom: 0.8em; }
-
-/* ---- 卡片排版：每行2張，手機1張 ---- */
 .student-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2.3rem 1.3rem;
   margin-top: 1.5em;
 }
-
-/* ---- 卡片本體與切一半橫排 ---- */
 .student-card {
   border-radius: 1.1em;
   padding: 1.5em 1.3em 1.2em 1.3em;
@@ -63,10 +59,6 @@ h2 {
   align-items: stretch;
   border: 2.5px solid #212937;  /* 黑色卡片底色外框 */
 }
-.card-b { background: #212937; }
-.card-b .student-name { color: #fff; }
-
-/* 切一半橫排 */
 .card-row {
   display: flex;
   width: 100%;
@@ -88,8 +80,6 @@ h2 {
   padding-left: 1em;
   align-items: flex-start;
 }
-
-/* ---- 頭像與資訊 ---- */
 .avatar-frame {
   width: 90%;
   max-width: 180px;
@@ -126,21 +116,6 @@ h2 {
   margin-bottom: 0.4em;
   color: #143158;
 }
-
-/* ---- 按鈕群 ---- */
-.card-btn-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55em;
-}
-.card-btn-group .btn {
-  min-width: 90px;
-  width: 100%;
-  max-width: 220px;
-  margin: 0.18em 0;
-}
 .btn {
   background: #1767a0;
   color: #fff;
@@ -151,12 +126,12 @@ h2 {
   cursor: pointer;
   margin-right: 0.2em;
   transition: background .15s;
+  text-decoration: none;
+  display: inline-block;
 }
 .btn-edit { background: #21694b; }
 .btn-link { background: #346689; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
-
-/* ---- 響應式 ---- */
 @media (max-width: 750px) {
   .container { padding: 1em; }
   .student-list { grid-template-columns: 1fr; }
@@ -169,93 +144,12 @@ h2 {
   .card-left, .card-right { padding: 0; border: none; }
   .avatar-frame { max-width: 80px; }
 }
-
-/* ----------- Modal 相關 ----------- */
-.modal-bg {
-  display: none;
-  position: fixed;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.22);
-  z-index: 1001;
-  justify-content: center;
-  align-items: center;
-}
-.modal-bg[style*="flex"], .modal-bg[style*="display: flex"] { display: flex !important; }
-.modal {
-  position: relative;
-  background: #fff;
-  border-radius: 1em;
-  max-width: 97vw;
-  min-width: 240px;
-  width: 420px;
-  box-sizing: border-box;
-  padding: 2em 1.5em;
-  box-shadow: 0 4px 24px #0004;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ======= canvas 區 ======= */
-#canvas-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 8 / 9;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-}
-#edit-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 400px;
-  max-height: 450px;
-  display: block;
-  background: #ddd;
-  border-radius: 0.7em;
-}
-#redbox-frame {
-  position: absolute;
-  left: 0; top: 0;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 400px;
-  max-height: 450px;
-  pointer-events: none;
-  z-index: 10;
-  object-fit: contain;
-  display: block;
-}
-
-@media (max-width: 500px) {
-  .modal {
-    width: 99vw;
-    padding: 1em 0.2em;
-    min-width: 0;
-    max-width: 99vw;
-  }
-  #canvas-wrap {
-    max-width: 99vw;
-    aspect-ratio: 8 / 9;
-  }
-}
-
-.close-btn {
-  position: absolute; top: 0.6em; right: 1em;
-  background: none; border: none; font-size: 1.6em; color: #999; cursor: pointer; z-index: 1001;
-}
-.close-btn:hover { color:#e2583e; }
-.hint { font-size: 0.95em; color: #888; margin-top: 0.7em; }
-
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>學生名冊</h2>
-<div class="title-underline"></div>
+    <h2>謝爾夏｜學生名冊</h2>
+    <div class="title-underline"></div>
     <div id="student-list" class="student-list"></div>
   </div>
   <script>
@@ -339,7 +233,7 @@ function renderStudentList(students) {
     infoDiv.innerHTML = `
       <div class="student-code">NO. ${stu.student_code}</div>
       <div class="student-name">${stu.name}</div>
-      <a class="btn-link" href="https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}" target="_blank">學生證</a>
+      <a class="btn btn-link" href="https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}" target="_blank">學生證</a>
     `;
 
     // 橫切一半
