@@ -290,8 +290,9 @@ async function getAllStudents() {
     if(r.status === "PASS") passedMap[r.student_id] = true;
   });
 
+  // 這裡有加上 alignment 欄位
   let { data: students } = await client.from('students')
-    .select('student_id,name,student_code')
+    .select('student_id,name,student_code,alignment')
     .not('student_code', 'is', null);
 
   students = (students || []).filter(s => passedMap[s.student_id]);
@@ -315,7 +316,9 @@ function renderStudentList(students) {
   wrap.innerHTML = '';
   students.forEach(stu => {
     let card = document.createElement('div');
-    card.className = "student-card";
+    // alignment === "black" 就加上 card-b
+    let isBlack = stu.alignment === "black";
+    card.className = "student-card" + (isBlack ? " card-b" : "");
 
     // 左側大頭像
     let avatarDiv = document.createElement('div');
@@ -332,9 +335,9 @@ function renderStudentList(students) {
     // 右側資訊區（只NO. 學號、本名、學生證按鈕）
     let infoDiv = document.createElement('div');
     infoDiv.className = 'student-info';
-infoDiv.innerHTML =
-  `<div class="student-code">NO. ${stu.student_code}</div>
-   <div class="student-name">${stu.name}</div>`;
+    infoDiv.innerHTML =
+      `<div class="student-code">NO. ${stu.student_code}</div>
+       <div class="student-name">${stu.name}</div>`;
 
     // 學生證按鈕
     let btnGroup = document.createElement('div');
@@ -367,6 +370,7 @@ infoDiv.innerHTML =
 }
 
 getAllStudents().then(renderStudentList);
+
   </script>
 </body>
 </html>
