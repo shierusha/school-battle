@@ -91,7 +91,7 @@ body {
 }
 .student-info {
   width: 100%;
-  text-align: center;
+
 }
 .student-name {
   font-size: 1.15em;
@@ -100,15 +100,14 @@ body {
   line-height: 1.2em;
   word-break: break-all;
   letter-spacing: .04em;
+ text-align: center;
 }
 
 .student-code {
-  font-size: 1em;            /* 比 .student-name 小一點 */
+  font-size: 1em;          
   font-weight: 600;
-  color: #143158;            /* 標題同色 */
+  color: #143158;          
   min-height: 2em;
-  margin-bottom: 0.2em;
-  letter-spacing: .04em;
   word-break: break-all;
 }
 
@@ -143,7 +142,7 @@ body {
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* ---- 響應式 ---- */
-@media (max-width: 750px) {
+@media (max-width: 430px) {
   .container { padding: 1em; }
   .student-list { grid-template-columns: 1fr; }
 }
