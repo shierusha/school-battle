@@ -1,5 +1,3 @@
-// card-fetcher.js
-
 window.supabase = window.supabase || supabase;
 window.client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
@@ -78,13 +76,14 @@ async function fetchStudentData(client, stuParam, isAdmin) {
   return data;
 }
 
-// 查技能
+// 查技能（這裡加入 movement_skill 資訊）
 async function fetchSkills(client, student_id) {
   let { data: skills, error } = await client
     .from('student_skills')
     .select(`
       *,
       passive_trigger:passive_trigger_id(condition),
+      movement_skill:linked_movement_id(move_name),
       student_skill_effect_links(effect_id, skill_id, effect:effect_id(effect_name,description)),
       student_skill_debuff_links(debuff_id, skill_id, applied_to, debuff:debuff_id(debuff_name))
     `)
@@ -99,11 +98,12 @@ async function fetchSkills(client, student_id) {
       name: d.debuff?.debuff_name
     })).filter(d => d.name),
     custom_skill_effect: s.custom_skill_uuid && s.custom_skill_uuid.description,
-    trigger_condition: s.passive_trigger && s.passive_trigger.condition
+    trigger_condition: s.passive_trigger && s.passive_trigger.condition,
+    movement_effect_name: s.movement_skill?.move_name   // 新增
   }));
 }
 
-// 填入資料（跟你之前 st.js 互動即可）
+// 填入資料
 function fillStudentCard(student, skills) {
   const frontImg = (student.student_images || []).find(i => i.image_type === "front");
   const backImg = (student.student_images || []).find(i => i.image_type === "back") || frontImg;
@@ -133,6 +133,7 @@ function fillStudentCard(student, skills) {
   });
   document.querySelectorAll('[data-key="students.preferred_role"]').forEach(el => el.innerText = mapEnum(student.preferred_role, ROLE_MAP));
   document.querySelectorAll('[data-key="students.starting_position"]').forEach(el => el.innerText = mapEnum(student.starting_position, POSITION_MAP));
+  document.querySelectorAll('[data-key="students.personality"]').forEach(el => el.innerText = student.personality || ""); // 新增這行
 
   document.querySelectorAll('[data-key="student_notes.content"]').forEach(el => {
     if (!student.student_notes || student.student_notes.length === 0) {
@@ -158,7 +159,7 @@ function fillStudentCard(student, skills) {
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.range"]`).forEach(el => el.innerText = mapEnum(skill.range, RANGE_MAP));
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.description"]`).forEach(el => {
       if (skill.is_passive && skill.trigger_condition) {
-        el.innerText = `${skill.description || ""\n\n條件：${skill.trigger_condition}}`;
+        el.innerText = `條件：${skill.trigger_condition}\n\n${skill.description || ""}`;
       } else {
         el.innerText = skill.description || "";
       }
@@ -167,6 +168,7 @@ function fillStudentCard(student, skills) {
       let html = "";
       if (skill.custom_skill_effect) html += `${skill.custom_skill_effect}\n\n`;
       if (skill.effects && skill.effects.length > 0) skill.effects.forEach(e => html += `# ${e}\n`);
+      if (skill.movement_effect_name) html += `# ${skill.movement_effect_name}\n`;
       if (skill.debuffs && skill.debuffs.length > 0) skill.debuffs.forEach(d => html += `# ${d.applied_to}${d.name}\n`);
       el.innerText = html;
     });
@@ -181,13 +183,17 @@ function fillStudentCard(student, skills) {
       el.onclick = () => {
         let html = "";
         extraSkills.forEach(skill => {
-          html += `${skill.skill_name}\n${skill.description}\n\n`;
+          html += `${skill.skill_name || ""}\n${skill.description || ""}\n\n`;
         });
         if (typeof showInfoModal === "function")
           showInfoModal("額外技能", html.replace(/\n/g, "<br>"));
       };
     }
   });
+
+  // 填完資料後再調字體跟 More 按鈕
+  if (typeof fitAll === "function") fitAll();
+  if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(13);
 }
 
 // 自動流程
@@ -205,10 +211,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   const skills = await fetchSkills(window.client, student.student_id);
-  console.log('skills', skills);    // <-- 這行
 
   fillStudentCard(student, skills);
-
-  if (typeof fitAll === "function") fitAll();
-  if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(13);
 });
