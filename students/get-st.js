@@ -165,9 +165,9 @@ function fillStudentCard(student, skills) {
     });
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.effectsAndDebuffs"]`).forEach(el => {
       let html = "";
-      if (skill.custom_skill_effect) html += `【${skill.custom_skill_effect}】\n\n`;
-      if (skill.effects && skill.effects.length > 0) skill.effects.forEach(e => html += `# 【${e}】\n`);
-      if (skill.debuffs && skill.debuffs.length > 0) skill.debuffs.forEach(d => html += `# ${d.applied_to}【${d.name}】\n`);
+      if (skill.custom_skill_effect) html += `${skill.custom_skill_effect}\n\n`;
+      if (skill.effects && skill.effects.length > 0) skill.effects.forEach(e => html += `# ${e}\n`);
+      if (skill.debuffs && skill.debuffs.length > 0) skill.debuffs.forEach(d => html += `# ${d.applied_to}${d.name}\n`);
       el.innerText = html;
     });
   }
