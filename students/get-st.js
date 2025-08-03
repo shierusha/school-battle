@@ -148,7 +148,7 @@ function fillStudentCard(student, skills) {
   for (let i = 0; i < 2; i++) {
     const skill = skills[i] || {};
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.skill_name"]`).forEach(el => el.innerText = skill.skill_name || "");
-    document.querySelectorAll(`[data-key="student_skills.${i + 1}.final_cd"]`).forEach(el => el.innerText = skill.is_passive ? "X" : (skill.final_cd || ""));
+    document.querySelectorAll(`[data-key="student_skills.${i + 1}.final_cd"]`).forEach(el => el.innerText = skill.is_passive ? "X" : (skill.final_cd ?? 0));
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.max_targets"]`).forEach(el => {
       let val = skill.max_targets;
       if (val === 1) el.innerText = "單體";
