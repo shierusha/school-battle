@@ -178,6 +178,7 @@ function fillStudentCard(student, skills) {
   document.querySelectorAll('[data-key="student_skills.extra_skills"]').forEach(el => {
     if (extraSkills.length === 0) {
       el.style.display = "none";
+      el.onclick = null;
     } else {
       el.style.display = "";
       el.onclick = () => {
@@ -191,6 +192,9 @@ function fillStudentCard(student, skills) {
     }
   });
 
+  // ★★★ 這裡是修正重點：填完資料後才執行這兩個 function
+  if (typeof fitAll === "function") fitAll();
+  if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(13);
 }
 
 // 自動流程
@@ -213,9 +217,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-
 //-----------------------------------------------------------
-//---------------------------------------------
+
 function setNameFontSize(selector, maxChars) {
   document.querySelectorAll(selector).forEach(box => {
     const nameDiv = box.querySelector('.name-box');
@@ -266,8 +269,7 @@ function fitAll() {
   fitAllNameBoxes();
   setInfoBoxFontSize();
   setFlipBtnFontSize();
-  setStudentIdFontSize(); // 新增這行
-
+  setStudentIdFontSize();
 }
 
 window.addEventListener('DOMContentLoaded', fitAll);
@@ -275,11 +277,7 @@ window.addEventListener('resize', fitAll);
 window.addEventListener('load', fitAll);
 
 
-
-
-
-
-  // 更多
+// 更多
 // 判斷 info-value 超過 13 字才顯示 ...MORE
 function checkLongTextByCharCount(N = 13) {
   document.querySelectorAll('.info-box').forEach(box => {
@@ -289,7 +287,7 @@ function checkLongTextByCharCount(N = 13) {
     if (value.innerText.trim().length > N) {
       btn.style.display = 'block';
       btn.onclick = function() {
-        // 標題優先抓 info-label, 沒有就用 data-title (button自訂)，最後才 "內容"
+        // 標題優先抓 info-label, 沒有就用 data-title (button自訂)，最後才 "效果"
         const label = this.dataset.title || box.querySelector('.info-label')?.innerText || "效果";
         showInfoModal(label, value.innerHTML);
       }
@@ -298,8 +296,7 @@ function checkLongTextByCharCount(N = 13) {
     }
   });
 }
-// 初次和視窗大小變動時都要判斷一次
-window.addEventListener('DOMContentLoaded', () => checkLongTextByCharCount(13));
+// 初次不要呼叫，resize 時才判斷
 window.addEventListener('resize', () => checkLongTextByCharCount(13));
 
 
@@ -316,9 +313,6 @@ document.getElementById('info-modal').addEventListener('click', function(e) {
     this.style.display = 'none';
   }
 });
-
-
-
 
 
 window.addEventListener('DOMContentLoaded', () => {
