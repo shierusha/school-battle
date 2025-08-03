@@ -127,12 +127,11 @@ function fillStudentCard(student, skills) {
   document.querySelectorAll('[data-key="students.hate"]').forEach(el => el.innerText = student.hate || "");
   document.querySelectorAll('[data-key="students.background"]').forEach(el => el.innerText = student.background || "");
   document.querySelectorAll('[data-key="students.occupation_type"]').forEach(el => el.innerText = mapEnum(student.occupation_type, OCCUPATION_MAP));
-  document.querySelectorAll('[data-key="students.element"]').forEach(el => el.innerText = mapEnum(student.element, ELEMENT_MAP));
+document.querySelectorAll('[data-key="students.element"]').forEach(el => { el.innerText = student.element ? mapEnum(student.element, ELEMENT_MAP) : "無";});
   document.querySelectorAll('[data-key="element_weakness.element"]').forEach(el => {
-    el.innerText = student.element_weakness && student.element_weakness.element ? mapEnum(student.element_weakness.element, ELEMENT_MAP) : "無";
-  });
+    el.innerText = student.element_weakness && student.element_weakness.element ? mapEnum(student.element_weakness.element, ELEMENT_MAP) : "無"; });
   document.querySelectorAll('[data-key="students.preferred_role"]').forEach(el => el.innerText = mapEnum(student.preferred_role, ROLE_MAP));
-  document.querySelectorAll('[data-key="students.starting_position"]').forEach(el => el.innerText = mapEnum(student.starting_position, POSITION_MAP));
+  document.querySelectorAll('[data-key="students.starting_position"]').forEach(el => { el.innerText = student.starting_position ? mapEnum(student.starting_position, POSITION_MAP) : "無";});
   document.querySelectorAll('[data-key="students.personality"]').forEach(el => el.innerText = student.personality || ""); // 新增這行
 
   document.querySelectorAll('[data-key="student_notes.content"]').forEach(el => {
