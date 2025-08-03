@@ -121,15 +121,17 @@ function fillStudentCard(student, skills) {
     if (backImg) el.src = bustCache(backImg.image_url);
   });
 
-  document.querySelectorAll('[data-key="student_images.front_url"]').forEach(el => { if (frontImg) el.src = frontImg.image_url; });
-  document.querySelectorAll('[data-key="student_images.back_url"]').forEach(el => { if (backImg) el.src = backImg.image_url; });
-
   document.querySelectorAll('[data-key="students.student_code"]').forEach(el => el.innerText = student.student_code);
   document.querySelectorAll('[data-key="students.name"]').forEach(el => el.innerText = student.name);
-  document.querySelectorAll('[data-key="students.nickname"]').forEach(el => {
-    if (!student.nickname) el.parentElement.style.display = 'none';
-    else el.innerText = student.nickname;
-  });
+document.querySelectorAll('[data-key="students.nickname"]').forEach(el => {
+  if (!student.nickname) {
+    el.parentElement.style.display = 'none';
+    el.innerText = "";
+  } else {
+    el.parentElement.style.display = '';   // ← 若要回復顯示
+    el.innerText = student.nickname;
+  }
+});
   document.querySelectorAll('[data-key="students.alignment"]').forEach(el => el.innerText = mapEnum(student.alignment, ALIGNMENT_MAP));
   document.querySelectorAll('[data-key="students.race"]').forEach(el => el.innerText = student.race || "");
   document.querySelectorAll('[data-key="students.age"]').forEach(el => el.innerText = (student.age && student.age > 0) ? student.age : "？");
