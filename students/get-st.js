@@ -36,6 +36,11 @@ function isUuid(v) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 }
 
+
+function bustCache(url) {
+  if (!url) return '';
+  return url + (url.includes('?') ? '&v=' : '?v=') + Date.now();
+}
 // 查目前登入帳號在players表的role（判斷是不是admin）
 async function getIsAdmin(client) {
   const { data: { user } } = await client.auth.getUser();
@@ -107,6 +112,14 @@ async function fetchSkills(client, student_id) {
 function fillStudentCard(student, skills) {
   const frontImg = (student.student_images || []).find(i => i.image_type === "front");
   const backImg = (student.student_images || []).find(i => i.image_type === "back") || frontImg;
+
+    // 加 cache-busting
+  document.querySelectorAll('[data-key="student_images.front_url"]').forEach(el => {
+    if (frontImg) el.src = bustCache(frontImg.image_url);
+  });
+  document.querySelectorAll('[data-key="student_images.back_url"]').forEach(el => {
+    if (backImg) el.src = bustCache(backImg.image_url);
+  });
 
   document.querySelectorAll('[data-key="student_images.front_url"]').forEach(el => { if (frontImg) el.src = frontImg.image_url; });
   document.querySelectorAll('[data-key="student_images.back_url"]').forEach(el => { if (backImg) el.src = backImg.image_url; });
