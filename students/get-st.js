@@ -11,7 +11,7 @@ const TEST_STUDENT_IDS = [
   '845dd04d-ff39-43a8-ad84-e8f714a8b454',
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'
 ];
-const SPECIAL_PLAYER_ID = '126bda27-405c-45a3-8f54-1e819fe44c8c';
+const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098';
 
 const OCCUPATION_MAP = { attack: "攻擊手", healer: "補師", tank: "坦克", buffer: "增益手", jammer: "妨礙手" };
 const GENDER_MAP = { M: "男", F: "女", O: "其他" };
