@@ -16,7 +16,19 @@ body.dark-bg::before {
   background: rgba(0,0,0,0.3); /* 黑色半透明 */
 }
 
-
+.skill-diamond {
+    position: absolute;
+    top: 11%;
+    right: 5%;
+    width: 3%;
+    aspect-ratio: 1 / 1;
+    background: yellow;
+    transform: rotate(45deg);
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+    border-radius: 2px;
+}
   /*翻轉區 */
     .flip-card {
      max-width: 75vw;
