@@ -196,8 +196,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!stuParam || !window.client) return;
 
   const isAdmin = await getIsAdmin(window.client);
+  console.log('isAdmin', isAdmin);  // <-- 這行
 
   const student = await fetchStudentData(window.client, stuParam, isAdmin);
+  console.log('student', student);  // <-- 這行
 
   if (!student) {
     alert("無此學生卡，或沒有權限查詢");
@@ -205,6 +207,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   const skills = await fetchSkills(window.client, student.student_id);
+  console.log('skills', skills);    // <-- 這行
+
   fillStudentCard(student, skills);
 
   if (typeof fitAll === "function") fitAll();
