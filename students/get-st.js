@@ -11,7 +11,7 @@ const TEST_STUDENT_IDS = [
   '845dd04d-ff39-43a8-ad84-e8f714a8b454',
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'
 ];
-const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098';
+const SPECIAL_PLAYER_ID = '126bda27-405c-45a3-8f54-1e819fe44c8c';
 
 const OCCUPATION_MAP = { attack: "攻擊手", healer: "補師", tank: "坦克", buffer: "增益手", jammer: "妨礙手" };
 const GENDER_MAP = { M: "男", F: "女", O: "其他" };
@@ -159,7 +159,7 @@ function fillStudentCard(student, skills) {
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.range"]`).forEach(el => el.innerText = mapEnum(skill.range, RANGE_MAP));
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.description"]`).forEach(el => {
       if (skill.is_passive && skill.trigger_condition) {
-        el.innerText = `條件：${skill.trigger_condition}\n\n${skill.description || ""}`;
+        el.innerText = `${skill.description || ""}\n\n條件：${skill.trigger_condition}`;
       } else {
         el.innerText = skill.description || "";
       }
@@ -168,7 +168,7 @@ function fillStudentCard(student, skills) {
       let html = "";
       if (skill.custom_skill_effect) html += `${skill.custom_skill_effect}\n\n`;
       if (skill.effects && skill.effects.length > 0) skill.effects.forEach(e => html += `# ${e}\n`);
-      if (skill.movement_effect_name) html += `# ${skill.movement_effect_name}\n`;
+      if (skill.movement_effect_name) html += `# 移動效果${skill.movement_effect_name}\n`;
       if (skill.debuffs && skill.debuffs.length > 0) skill.debuffs.forEach(d => html += `# ${d.applied_to}${d.name}\n`);
       el.innerText = html;
     });
