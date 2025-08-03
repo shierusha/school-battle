@@ -167,7 +167,7 @@ document.querySelectorAll('[data-key="students.element"]').forEach(el => { el.in
       let html = "";
       if (skill.custom_skill_effect) html += `${skill.custom_skill_effect}\n\n`;
       if (skill.effects && skill.effects.length > 0) skill.effects.forEach(e => html += `# ${e}\n`);
-      if (skill.movement_effect_name) html += `# 移動效果${skill.movement_effect_name}\n`;
+      if (skill.movement_effect_name) html += `# ${skill.movement_effect_name}\n`;
       if (skill.debuffs && skill.debuffs.length > 0) skill.debuffs.forEach(d => html += `# ${d.applied_to}${d.name}\n`);
       el.innerText = html;
     });
