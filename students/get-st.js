@@ -1,33 +1,25 @@
+// card-fetcher.js
+
 window.supabase = window.supabase || supabase;
 window.client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
 
-// 
-
 const TEST_STUDENT_IDS = [
   '24e1a631-016a-422a-9f27-a6e5774c254f',
   '434cbc99-9a4f-4334-bc71-7236b8daf51c',
   '6ceb01f3-d296-438f-be5a-eebfa6e30e41',
   '845dd04d-ff39-43a8-ad84-e8f714a8b454',
-  'ee8ea0cd-d664-4b5f-8f714a8b454',
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'
 ];
 const SPECIAL_PLAYER_ID = '126bda27-405c-45a3-8f54-1e819fe44c8c';
 
-const OCCUPATION_MAP = {
-  attack: "攻擊手", healer: "補師", tank: "坦克", buffer: "增益手", jammer: "妨礙手"
-};
-const GENDER_MAP = { M: "男", F: "女", O: "其他" }; 
+const OCCUPATION_MAP = { attack: "攻擊手", healer: "補師", tank: "坦克", buffer: "增益手", jammer: "妨礙手" };
+const GENDER_MAP = { M: "男", F: "女", O: "其他" };
 const ALIGNMENT_MAP = { white: "白", black: "黑" };
-const ELEMENT_MAP = {
-  fire: "火", water: "水", ice: "冰", wind: "風", earth: "土",
-  thunder: "雷", dark: "暗", light: "光"
-};
-const RANGE_MAP = {
-  same_zone: "近距離", cross_zone: "遠距離", all_zone: "遠近皆可"
-};
+const ELEMENT_MAP = { fire: "火", water: "水", ice: "冰", wind: "風", earth: "土", thunder: "雷", dark: "暗", light: "光" };
+const RANGE_MAP = { same_zone: "近距離", cross_zone: "遠距離", all_zone: "遠近皆可" };
 const ROLE_MAP = { melee: "近戰攻擊手", ranger: "遠攻攻擊手", balance: "普通攻擊手" };
 const POSITION_MAP = { close: "近戰區", far: "遠攻區" };
 
@@ -46,21 +38,37 @@ function isUuid(v) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 }
 
-async function fetchStudentData(client, stuParam) {
-  // 用 student_id 查 (白名單或特殊玩家)
+// 查目前登入帳號在players表的role（判斷是不是admin）
+async function getIsAdmin(client) {
+  const { data: { user } } = await client.auth.getUser();
+  const currentPlayerId = user?.id || "";
+  if (!currentPlayerId) return false;
+  let { data: player } = await client
+    .from('players')
+    .select('role')
+    .eq('player_id', currentPlayerId)
+    .maybeSingle();
+  return player && player.role === 'admin';
+}
+
+// 查學生卡（權限全部寫死）
+async function fetchStudentData(client, stuParam, isAdmin) {
   if (isUuid(stuParam)) {
+    // 用 student_id 查，只有 admin/白名單/特殊玩家能查
     let { data, error } = await client
       .from('students')
       .select('*, student_images(*), student_notes(*), player_id, element_weakness:weakness_id(element)')
       .eq('student_id', stuParam)
       .maybeSingle();
     if (error || !data) return null;
-    // 白名單 student 或特殊玩家才允許
-    if (TEST_STUDENT_IDS.includes(data.student_id) || data.player_id === SPECIAL_PLAYER_ID)
-      return data;
-    return null;
+    if (
+      TEST_STUDENT_IDS.includes(data.student_id) || // 白名單
+      data.player_id === SPECIAL_PLAYER_ID ||       // 特殊玩家
+      isAdmin                                       // 管理員
+    ) return data;
+    return null; // 其他人一律擋掉
   }
-  // 否則用 student_code 查
+  // 用 student_code 查，任何人都可
   let { data, error } = await client
     .from('students')
     .select('*, student_images(*), student_notes(*), element_weakness:weakness_id(element)')
@@ -70,9 +78,8 @@ async function fetchStudentData(client, stuParam) {
   return data;
 }
 
-// 技能查詢（技能同時帶效果、debuff、觸發條件）
+// 查技能
 async function fetchSkills(client, student_id) {
-  // 先查所有技能
   let { data: skills, error } = await client
     .from('student_skills')
     .select(`
@@ -84,7 +91,6 @@ async function fetchSkills(client, student_id) {
     .eq('student_id', student_id)
     .order('skill_slot', { ascending: true });
   if (error || !skills) return [];
-  // 整理資料
   return skills.map(s => ({
     ...s,
     effects: (s.student_skill_effect_links || []).map(e => e.effect?.effect_name).filter(Boolean),
@@ -97,16 +103,14 @@ async function fetchSkills(client, student_id) {
   }));
 }
 
-// 填入卡片
+// 填入資料（跟你之前 st.js 互動即可）
 function fillStudentCard(student, skills) {
-  // 正反面圖片
   const frontImg = (student.student_images || []).find(i => i.image_type === "front");
   const backImg = (student.student_images || []).find(i => i.image_type === "back") || frontImg;
 
   document.querySelectorAll('[data-key="student_images.front_url"]').forEach(el => { if (frontImg) el.src = frontImg.image_url; });
   document.querySelectorAll('[data-key="student_images.back_url"]').forEach(el => { if (backImg) el.src = backImg.image_url; });
 
-  // 主要欄位
   document.querySelectorAll('[data-key="students.student_code"]').forEach(el => el.innerText = student.student_code);
   document.querySelectorAll('[data-key="students.name"]').forEach(el => el.innerText = student.name);
   document.querySelectorAll('[data-key="students.nickname"]').forEach(el => {
@@ -130,7 +134,6 @@ function fillStudentCard(student, skills) {
   document.querySelectorAll('[data-key="students.preferred_role"]').forEach(el => el.innerText = mapEnum(student.preferred_role, ROLE_MAP));
   document.querySelectorAll('[data-key="students.starting_position"]').forEach(el => el.innerText = mapEnum(student.starting_position, POSITION_MAP));
 
-  // 角色設定（notes）
   document.querySelectorAll('[data-key="student_notes.content"]').forEach(el => {
     if (!student.student_notes || student.student_notes.length === 0) {
       el.innerText = "";
@@ -142,7 +145,6 @@ function fillStudentCard(student, skills) {
       .join('\n');
   });
 
-  // 技能
   for (let i = 0; i < 2; i++) {
     const skill = skills[i] || {};
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.skill_name"]`).forEach(el => el.innerText = skill.skill_name || "");
@@ -170,7 +172,6 @@ function fillStudentCard(student, skills) {
     });
   }
 
-  // 額外技能
   const extraSkills = skills.slice(2);
   document.querySelectorAll('[data-key="student_skills.extra_skills"]').forEach(el => {
     if (extraSkills.length === 0) {
@@ -189,23 +190,23 @@ function fillStudentCard(student, skills) {
   });
 }
 
-// 自動執行
+// 自動流程
 window.addEventListener('DOMContentLoaded', async () => {
-  // 1. 解析參數
   const stuParam = getStuParam();
   if (!stuParam || !window.client) return;
 
-  // 2. 抓主資料
-  const student = await fetchStudentData(window.client, stuParam);
+  const isAdmin = await getIsAdmin(window.client);
+
+  const student = await fetchStudentData(window.client, stuParam, isAdmin);
+
   if (!student) {
-    alert("? 你想找誰?");
+    alert("無此學生卡，或沒有權限查詢");
     return;
   }
-  // 3. 抓技能
+
   const skills = await fetchSkills(window.client, student.student_id);
-  // 4. 塞到卡片
   fillStudentCard(student, skills);
-  // 5. 字型適配
+
   if (typeof fitAll === "function") fitAll();
   if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(13);
 });
