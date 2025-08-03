@@ -158,7 +158,7 @@ function fillStudentCard(student, skills) {
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.range"]`).forEach(el => el.innerText = mapEnum(skill.range, RANGE_MAP));
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.description"]`).forEach(el => {
       if (skill.is_passive && skill.trigger_condition) {
-        el.innerText = `條件：\n${skill.trigger_condition}\n\n${skill.description || ""}`;
+        el.innerText = `${skill.description || ""\n\n條件：${skill.trigger_condition}}`;
       } else {
         el.innerText = skill.description || "";
       }
