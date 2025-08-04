@@ -216,7 +216,7 @@ document.querySelectorAll('[data-key="students.element"]').forEach(el => { el.in
 
   // ★★★ 這裡是修正重點：填完資料後才執行這兩個 function
   if (typeof fitAll === "function") fitAll();
-  if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(13);
+  if (typeof checkLongTextByCharCount === "function") checkLongTextByCharCount(11);
 }
 
 // 自動流程
@@ -300,8 +300,8 @@ window.addEventListener('load', fitAll);
 
 
 // 更多
-// 判斷 info-value 超過 13 字才顯示 ...MORE
-function checkLongTextByCharCount(N = 13) {
+// 判斷 info-value 超過 11 字才顯示 ...MORE
+function checkLongTextByCharCount(N = 11) {
   document.querySelectorAll('.info-box').forEach(box => {
     const value = box.querySelector('.info-value');
     const btn = box.querySelector('.show-more-btn');
@@ -319,7 +319,7 @@ function checkLongTextByCharCount(N = 13) {
   });
 }
 // 初次不要呼叫，resize 時才判斷
-window.addEventListener('resize', () => checkLongTextByCharCount(13));
+window.addEventListener('resize', () => checkLongTextByCharCount(11));
 
 
 // 彈跳視窗相關
