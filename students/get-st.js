@@ -65,11 +65,11 @@ async function fetchStudentData(client, stuParam, isAdmin) {
       .maybeSingle();
     if (error || !data) return null;
     if (
-      TEST_STUDENT_IDS.includes(data.student_id) || // 白名單
-      data.player_id === SPECIAL_PLAYER_ID ||       // 特殊玩家
-      isAdmin                                       // 管理員
-    ) return data;
-    return null; // 其他人一律擋掉
+  TEST_STUDENT_IDS.includes(data.student_id) ||
+  String(data.player_id).trim() === String(SPECIAL_PLAYER_ID).trim() ||
+  isAdmin
+) return data;
+return null;
   }
   // 用 student_code 查，任何人都可
   let { data, error } = await client
