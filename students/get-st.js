@@ -5,13 +5,13 @@ window.client = window.supabase.createClient(
 );
 
 const TEST_STUDENT_IDS = [
-  '24e1a631-016a-422a-9f27-a6e5774c254f',
-  '434cbc99-9a4f-4334-bc71-7236b8daf51c',
-  '6ceb01f3-d296-438f-be5a-eebfa6e30e41',
-  '845dd04d-ff39-43a8-ad84-e8f714a8b454',
-  'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'
+  '434cbc99-9a4f-4334-bc71-7236b8daf51c', // 777
+  '6ceb01f3-d296-438f-be5a-eebfa6e30e41', // 夢荔枝
+  '845dd04d-ff39-43a8-ad84-e8f714a8b454', //工具寵
+  'ce88dbdc-2a86-442d-ba32-de48857bdce9', //原來梨是瑰亞珥
+  'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'//現荔枝
 ];
-const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098';
+const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098'; //其實是AI
 
 const OCCUPATION_MAP = { attack: "攻擊手", healer: "補師", tank: "坦克", buffer: "增益手", jammer: "妨礙手" };
 const GENDER_MAP = { M: "男", F: "女", O: "其他" };
