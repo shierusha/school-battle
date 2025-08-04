@@ -55,22 +55,30 @@ async function getIsAdmin(client) {
 }
 
 // 查學生卡（權限全部寫死）
+
+
 async function fetchStudentData(client, stuParam, isAdmin) {
-  if (isUuid(stuParam)) {
-    // 用 student_id 查，只有 admin/白名單/特殊玩家能查
-    let { data, error } = await client
-      .from('students')
-      .select('*, student_images(*), student_notes(*), player_id, element_weakness:weakness_id(element)')
-      .eq('student_id', stuParam)
-      .maybeSingle();
-    if (error || !data) return null;
-    if (
-      TEST_STUDENT_IDS.includes(data.student_id) || // 白名單
-      data.player_id === SPECIAL_PLAYER_ID ||       // 特殊玩家
-      isAdmin                                       // 管理員
-    ) return data;
-    return null; // 其他人一律擋掉
-  }
+if (isUuid(stuParam)) {
+  let { data, error } = await client
+    .from('students')
+    .select('*, student_images(*), student_notes(*), player_id, element_weakness:weakness_id(element)')
+    .eq('student_id', stuParam)
+    .maybeSingle();
+  if (error || !data) return null;
+
+  // 只要這張卡是特殊玩家的，任何人都能查
+  if (data.player_id === SPECIAL_PLAYER_ID) return data;
+
+  // 其他卡走權限
+  if (
+    TEST_STUDENT_IDS.includes(data.student_id) || // 白名單
+    isAdmin                                       // 管理員
+  ) return data;
+
+  return null;
+}
+
+  
   // 用 student_code 查，任何人都可
   let { data, error } = await client
     .from('students')
