@@ -283,8 +283,8 @@ body.dark-bg::before {
   font-weight: 500;
   letter-spacing: 0.01em;
   flex: 1 1 0;
-  overflow-wrap: break-word;
 white-space: pre-line;
+overflow-wrap: anywhere;
 }
 
 .show-more-btn {
