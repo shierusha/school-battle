@@ -3,12 +3,12 @@ window.client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
-
+//角色卡ID
 const TEST_STUDENT_IDS = [
   '434cbc99-9a4f-4334-bc71-7236b8daf51c', // 777
   '6ceb01f3-d296-438f-be5a-eebfa6e30e41', // 夢荔枝
   '845dd04d-ff39-43a8-ad84-e8f714a8b454', //工具寵
-  'ce88dbdc-2a86-442d-ba32-de48857bdce9', //一顆梨
+  'fe4e4c3e-66ae-4ded-afe6-417f73979131', //梨
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'//現荔枝
 ];
 const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098'; //其實是AI
