@@ -9,6 +9,7 @@ const TEST_STUDENT_IDS = [
   '6ceb01f3-d296-438f-be5a-eebfa6e30e41', // 夢荔枝
   '845dd04d-ff39-43a8-ad84-e8f714a8b454', //工具寵
   'fe4e4c3e-66ae-4ded-afe6-417f73979131', //梨
+  '7712a95b-7884-4e34-8dba-65ff01084b16', //咕咕
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'//現荔枝
 ];
 const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098'; //其實是AI
