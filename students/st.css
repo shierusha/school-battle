@@ -382,7 +382,15 @@ pointer-events: none;
   word-break: break-all;  /* or break-word; 都可以 */
   max-height: 240px;      /* 依照 modal 高度調整 */
   white-space: pre-line;
+  overflow: auto;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE & Edge */
 }
+
+.modal-body::-webkit-scrollbar {
+  display: none;                  /* Chrome & Safari */
+}
+
 
 
 
