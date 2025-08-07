@@ -119,6 +119,7 @@ async function fetchSkills(client, student_id) {
 
 // 填入資料
 function fillStudentCard(student, skills) {
+  document.body.classList.toggle('dark-bg', student.alignment === 'black');
   const frontImg = (student.student_images || []).find(i => i.image_type === "front");
   const backImg = (student.student_images || []).find(i => i.image_type === "back") || frontImg;
 
