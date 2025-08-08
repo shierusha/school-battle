@@ -3,14 +3,15 @@ window.client = window.supabase.createClient(
   'https://wfhwhvodgikpducrhgda.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
-//角色卡ID
+//白名單角色卡ID
 const TEST_STUDENT_IDS = [
-  '434cbc99-9a4f-4334-bc71-7236b8daf51c', // 777
+  '434cbc99-9a4f-4334-bc71-7236b8daf51c', // 偉大的主
   '6ceb01f3-d296-438f-be5a-eebfa6e30e41', // 夢荔枝
   '845dd04d-ff39-43a8-ad84-e8f714a8b454', //工具寵
-  'fe4e4c3e-66ae-4ded-afe6-417f73979131', //梨
+  'fe4e4c3e-66ae-4ded-afe6-417f73979131', //美味可口梨
   '7712a95b-7884-4e34-8dba-65ff01084b16', //咕咕
   '7edd83a7-3d44-4876-a480-a8bc795f48b3', //碎影
+  '094427cf-55dc-45a0-b596-1d4e10a9275d', //101001010
   'ee8ea0cd-d664-4b5f-8d0e-0240bf9debdb'//現荔枝
 ];
 const SPECIAL_PLAYER_ID = '8aea3076-294c-41f6-bb38-0a99da77c098'; //其實是AI
