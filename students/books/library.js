@@ -60,9 +60,9 @@
   };
 
   // 顏色 -> 濾鏡（透明區不會被染色）
- // 乾淨一點的 hex -> hsl，避免變數遮蔽
+// 替換用：更保守、依 HSL 調整的 hex -> hsl 與 filter builder
 function hexToHsl(hexStr){
-  let s = hexStr.replace('#','');
+  let s = (hexStr || '#7c8cfb').replace('#','');
   if(s.length === 3) s = s.split('').map(c => c + c).join('');
   const r = parseInt(s.slice(0,2),16)/255;
   const g = parseInt(s.slice(2,4),16)/255;
@@ -81,28 +81,31 @@ function hexToHsl(hexStr){
   return { h: h || 0, s: sat || 0, l: l || 0 };
 }
 
-// 更柔和、依 hex 飽和度/明度調整的 filter builder
 function buildFilterFromHex(hex){
   const { h, s, l } = hexToHsl(hex || '#7c8cfb');
 
-  // 根據色相、飽和度與明度計算各 filter 參數
-  const hue = Math.round(h);                     // hue-rotate
-  const sepiaAmt = 0.6;                          // 把 sepia 拉小些，不要 1
-  // saturate 以原色飽和度為基礎：100% ~ 180%（s 接近 0 ~ 1）
-  const satPercent = Math.round(100 + s * 80);
-  // brightness 根據 L 微調，範圍 70% ~ 100%（避免太暗或破亮）
-  const brightPercent = Math.round(70 + (l * 30));
+  // 極暗或幾乎無飽和：走保守路線（避免 hue-rotate/sepi­a 導致偏色）
+  if (l < 0.12 || s < 0.03) {
+    // 只稍微壓亮度與微調對比，保留原本的「黑」感但更暗一些
+    // 這裡用 brightness(60%) ~ 75% 之間，視情況可調
+    const darkB = Math.round(60 + l * 30); // l 越大就不會那麼暗
+    return `sepia(0) saturate(100%) hue-rotate(0deg) brightness(${darkB}%) contrast(98%)`;
+  }
 
-  // 保護性 clamp（保證不會出現極端值）
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const sat = clamp(satPercent, 80, 220);
-  const bright = clamp(brightPercent, 60, 110);
+  // 一般有色彩的情況：溫和染色並降低亮度（不會過飽和或極端偏色）
+  const sepiaAmt = 0.25;                           // 低量 sepia，保留一些暖感
+  const satPercent = Math.round(90 + s * 60);     // 大約 90% ~ 150%
+  const brightPercent = Math.round(65 + l * 35);  // 大約 65% ~ 100% -> 比原圖稍微變暗
 
-  return `sepia(${sepiaAmt}) saturate(${sat}%) hue-rotate(${hue}deg) brightness(${bright}%)`;
+  // 保護性 clamp，避免極端值
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  const sat = clamp(satPercent, 80, 180);
+  const bright = clamp(brightPercent, 50, 110);
+
+  // 不做大幅 hue-rotate（那會把黑/深色弄綠），直接用溫和的 sepia+saturate+brightness
+  return `sepia(${sepiaAmt}) saturate(${sat}%) hue-rotate(0deg) brightness(${bright}%) contrast(98%)`;
 }
 
-
-  // ---------------- DOM refs ----------------
   // ---------------- DOM refs ----------------
 const libGrid   = $('#libGrid');
 const dlgNew    = $('#dlgNew');       // 已存在：新增書籍
