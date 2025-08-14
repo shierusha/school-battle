@@ -61,6 +61,7 @@
 
   // 顏色 -> 濾鏡（透明區不會被染色）
 // 替換用：更保守、依 HSL 調整的 hex -> hsl 與 filter builder
+// hex -> hsl（保留原本實作）
 function hexToHsl(hexStr){
   let s = (hexStr || '#7c8cfb').replace('#','');
   if(s.length === 3) s = s.split('').map(c => c + c).join('');
@@ -81,30 +82,43 @@ function hexToHsl(hexStr){
   return { h: h || 0, s: sat || 0, l: l || 0 };
 }
 
+/*
+  更智慧的 filter builder：
+  - 對極暗或無飽和顏色採保守路線（避免偏色）
+  - 對中間亮度（midtones）增加額外飽和補償，使顏色看起來更鮮豔但不刺眼
+  - 可調參數：SAT_MULTIPLIER, SAT_EXTRA_MAX, SEPIA_AMT, BRIGHT_BASE
+*/
 function buildFilterFromHex(hex){
   const { h, s, l } = hexToHsl(hex || '#7c8cfb');
 
-  // 極暗或幾乎無飽和：走保守路線（避免 hue-rotate/sepi­a 導致偏色）
-  if (l < 0.12 || s < 0.03) {
-    // 只稍微壓亮度與微調對比，保留原本的「黑」感但更暗一些
-    // 這裡用 brightness(60%) ~ 75% 之間，視情況可調
-    const darkB = Math.round(60 + l * 30); // l 越大就不會那麼暗
-    return `sepia(0) saturate(100%) hue-rotate(0deg) brightness(${darkB}%) contrast(98%)`;
+  // === 可調參數（你可以改這些值來快速微調） ===
+  const SEPIA_AMT = 0.22;        // sepia 量（越高越暖，但會偏色）
+  const SAT_MULTIPLIER = 100;   // 基礎飽和度乘數（100 ~ 140 之間常用）
+  const SAT_EXTRA_MAX = 50;     // midtones 額外飽和上限（0~80；越大越鮮豔）
+  const BRIGHT_BASE = 66;       // brightness 起始值（%），越小越暗
+  const CONTRAST_PCT = 98;      // 統一略微調整對比（可 95~102）
+  // ==============================================
+
+  // 若是極暗或幾乎無飽和（黑 / 深灰 / 幾乎純色），採保守路線避免偏綠
+  if (l < 0.10 || s < 0.03) {
+    const darkB = Math.round(BRIGHT_BASE - 6 + l * 30); // l 越大就不會那麼暗
+    return `sepia(0) saturate(100%) hue-rotate(0deg) brightness(${darkB}%) contrast(${CONTRAST_PCT}%)`;
   }
 
-  // 一般有色彩的情況：溫和染色並降低亮度（不會過飽和或極端偏色）
-  const sepiaAmt = 0.25;                           // 低量 sepia，保留一些暖感
-  const satPercent = Math.round(90 + s * 60);     // 大約 90% ~ 150%
-  const brightPercent = Math.round(65 + l * 35);  // 大約 65% ~ 100% -> 比原圖稍微變暗
+  // 計算：基礎飽和度 + 針對 midtones 的額外增強
+  // midFactor: 當 l 接近 0.5（中間亮度）時會最高（1），接近 0 或 1 時會趨近 0
+  const midFactor = 1 - Math.abs(l - 0.5) / 0.5; // 0~1
+  const satBase = Math.round(90 + s * SAT_MULTIPLIER);            // 約 90% ~ (90+SAT_MULTIPLIER)
+  const satExtra = Math.round(SAT_EXTRA_MAX * midFactor);         // midtones 額外補償
+  const satPercent = Math.max(80, Math.min(240, satBase + satExtra));
 
-  // 保護性 clamp，避免極端值
-  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
-  const sat = clamp(satPercent, 80, 180);
-  const bright = clamp(brightPercent, 50, 110);
+  // brightness: 以 base 為起點，受 l 影響
+  const brightPercent = Math.round(BRIGHT_BASE + l * (100 - BRIGHT_BASE));
 
-  // 不做大幅 hue-rotate（那會把黑/深色弄綠），直接用溫和的 sepia+saturate+brightness
-  return `sepia(${sepiaAmt}) saturate(${sat}%) hue-rotate(0deg) brightness(${bright}%) contrast(98%)`;
+  // 回傳（不做大幅 hue-rotate，避免偏色）
+  return `sepia(${SEPIA_AMT}) saturate(${satPercent}%) hue-rotate(0deg) brightness(${brightPercent}%) contrast(${CONTRAST_PCT}%)`;
 }
+
 
   // ---------------- DOM refs ----------------
 const libGrid   = $('#libGrid');
