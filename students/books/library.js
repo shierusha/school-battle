@@ -60,19 +60,47 @@
   };
 
   // 顏色 -> 濾鏡（透明區不會被染色）
-  function hexToHsl(hex){
-    let s=hex.replace('#',''); if(s.length===3) s=s.split('').map(c=>c+c).join('');
-    const r=parseInt(s.slice(0,2),16)/255, g=parseInt(s.slice(2,4),16)/255, b=parseInt(s.slice(4,6),16)/255;
-    const max=Math.max(r,g,b), min=Math.min(r,g,b); let h=0, l=(max+min)/2, d=max-min, S=0;
-    if(d!==0){ S=l>0.5? d/(2-max-min) : d/(max+min); switch(max){ case r:h=(g-b)/d+(g<b?6:0);break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break;} h*=60; }
-    return {h, s:S, l};
+ // 乾淨一點的 hex -> hsl，避免變數遮蔽
+function hexToHsl(hexStr){
+  let s = hexStr.replace('#','');
+  if(s.length === 3) s = s.split('').map(c => c + c).join('');
+  const r = parseInt(s.slice(0,2),16)/255;
+  const g = parseInt(s.slice(2,4),16)/255;
+  const b = parseInt(s.slice(4,6),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h = 0, l = (max + min) / 2, d = max - min, sat = 0;
+  if(d !== 0){
+    sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch(max){
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h = h * 60;
   }
-  function buildFilterFromHex(hex){
-    const {h,l}=hexToHsl(hex);
-    const hue = Math.round(h);
-    const bright = Math.round(60 + (l*40)); // 60%~100%
-    return `sepia(1) saturate(800%) hue-rotate(${hue}deg) brightness(${bright}%)`;
-  }
+  return { h: h || 0, s: sat || 0, l: l || 0 };
+}
+
+// 更柔和、依 hex 飽和度/明度調整的 filter builder
+function buildFilterFromHex(hex){
+  const { h, s, l } = hexToHsl(hex || '#7c8cfb');
+
+  // 根據色相、飽和度與明度計算各 filter 參數
+  const hue = Math.round(h);                     // hue-rotate
+  const sepiaAmt = 0.6;                          // 把 sepia 拉小些，不要 1
+  // saturate 以原色飽和度為基礎：100% ~ 180%（s 接近 0 ~ 1）
+  const satPercent = Math.round(100 + s * 80);
+  // brightness 根據 L 微調，範圍 70% ~ 100%（避免太暗或破亮）
+  const brightPercent = Math.round(70 + (l * 30));
+
+  // 保護性 clamp（保證不會出現極端值）
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const sat = clamp(satPercent, 80, 220);
+  const bright = clamp(brightPercent, 60, 110);
+
+  return `sepia(${sepiaAmt}) saturate(${sat}%) hue-rotate(${hue}deg) brightness(${bright}%)`;
+}
+
 
   // ---------------- DOM refs ----------------
   // ---------------- DOM refs ----------------
