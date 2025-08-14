@@ -71,7 +71,7 @@
     const {h,l}=hexToHsl(hex);
     const hue = Math.round(h);
     const bright = Math.round(60 + (l*40)); // 60%~100%
-    return `sepia(0.2) saturate(200%) hue-rotate(${hue}deg) brightness(${bright}%)`;
+    return `sepia(0.4) saturate(300%) hue-rotate(${hue}deg) brightness(${bright}%)`;
   }
 
   // ---------------- DOM refs ----------------
