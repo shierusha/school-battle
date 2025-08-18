@@ -349,6 +349,16 @@ function renderStudentList(students) {
     btnCert.onclick = ()=>window.open(`https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}`,'_blank');
     btnGroup.appendChild(btnCert);
 
+   // 故事集按鈕
+    let btnStory = document.createElement('button');
+    btnStory.className = 'btn btn-link';
+    btnStory.innerText = '故事集';
+    btnStory.onclick = () => {
+      // 直接帶 student_id, student_name 跳轉
+      window.location.href = `library?student_id=${stu.student_id}&student_name=${encodeURIComponent(stu.name)}`;
+    };
+    btnGroup.appendChild(btnStory);
+
     // 卡片排版
     let cardRow = document.createElement('div');
     cardRow.className = 'card-row';
