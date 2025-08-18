@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>角色故事集｜圖書館</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: 'Noto Sans TC', sans-serif; background: #f4f7fa; margin: 0; padding: 2rem;}
+    .main { max-width: 600px; margin: 2em auto; background: #fff; border-radius: 1.2em; box-shadow: 0 2px 16px #0001; padding: 2em;}
+    h2 { color: #1767a0; }
+    .btn { background: #1767a0; color: #fff; border: none; border-radius: .5em; padding: .5em 1.2em; margin: 1em 0;}
+    .book-list { margin-top: 2em; }
+    .book-item { padding: .9em 0; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="main" id="main"><div>載入中…</div></div>
+<script>
+const client = window.supabase.createClient(
+  'https://wfhwhvodgikpducrhgda.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
+);
+
+(async function() {
+  const main = document.getElementById('main');
+  // 取得目前登入者
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) {
+    main.innerHTML = "<div>請先登入帳號</div>";
+    return;
+  }
+
+  // 取得 URL 參數
+  const params = new URLSearchParams(window.location.search);
+  const student_id = params.get('student_id');
+  const student_name = params.get('student_name');
+
+  if(!student_id){
+    main.innerHTML = "<div>缺少角色資訊！請從學生證頁進入。</div>";
+    return;
+  }
+
+  // 查角色資訊
+  let { data: student } = await client
+    .from('students')
+    .select('player_id, name')
+    .eq('student_id', student_id)
+    .single();
+
+  // 查角色的所有書本
+  let { data: books } = await client
+    .from('books')
+    .select('id, title, updated_at')
+    .eq('student_id', student_id)
+    .order('updated_at', { ascending: false });
+
+  // 權限判斷
+  let canEdit = (student && student.player_id === user.id);
+
+  // 標題＋功能
+  main.innerHTML = `
+    <h2>【${student_name || student?.name || "未知角色"}】的故事集</h2>
+    <div style="color:#888;">${canEdit ? "你可以為此角色創作新書" : "你只能閱讀，無法創建新書"}</div>
+    ${canEdit ? '<button class="btn" id="btnNewBook">＋ 新增書籍</button>' : ''}
+    <div class="book-list">${books && books.length ? books.map(b=>`
+      <div class="book-item">📗 <b>${b.title}</b> <span style="color:#aaa;font-size:.95em;">(${b.updated_at?.slice(0,10)||""})</span></div>
+    `).join('') : '<div style="color:#aaa;">目前沒有書籍。</div>'}</div>
+  `;
+
+  // 創書功能（你可以改成開對話框 or 跳編輯器頁）
+  if(canEdit){
+    document.getElementById('btnNewBook').onclick = async ()=>{
+      const title = prompt("請輸入書名：", "我的故事書");
+      if(!title) return;
+      let { error } = await client.from('books').insert([{
+        owner_id: user.id,
+        student_id,
+        title,
+      }]);
+      if(error) return alert('新增失敗: ' + error.message);
+      location.reload();
+    }
+  }
+})();
+</script>
+</body>
+</html>
