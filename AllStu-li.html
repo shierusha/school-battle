@@ -382,6 +382,9 @@ function renderStudentList(students) {
 
 getAllStudents().then(renderStudentList);
 
+client.auth.getSession().then(({ data }) => {
+  console.log('auth session?', !!data.session, data.session?.user?.id);
+});
   </script>
 </body>
 </html>
