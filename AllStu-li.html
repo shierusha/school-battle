@@ -354,8 +354,8 @@ function renderStudentList(students) {
     btnStory.className = 'btn btn-link';
     btnStory.innerText = '故事集';
     btnStory.onclick = () => {
-      // 直接帶 student_id, student_name 跳轉
-      window.location.href = `library?student_id=${stu.student_id}&student_name=${encodeURIComponent(stu.name)}`;
+      // student_name 跳轉
+      window.location.href = `https://shierusha.github.io/library/library?student_name=${encodeURIComponent(stu.name)}`;
     };
     btnGroup.appendChild(btnStory);
 
