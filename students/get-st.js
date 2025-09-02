@@ -100,6 +100,7 @@ async function fetchSkills(client, student_id) {
     .from('student_skills')
     .select(`
       *,
+      custom_skill_uuid(description),  
       passive_trigger:passive_trigger_id(condition),
       movement_skill:linked_movement_id(move_name),
       student_skill_effect_links(effect_id, skill_id, effect:effect_id(effect_name,description)),
@@ -115,11 +116,12 @@ async function fetchSkills(client, student_id) {
       applied_to: d.applied_to === "self" ? "自身" : "目標",
       name: d.debuff?.debuff_name
     })).filter(d => d.name),
-    custom_skill_effect: s.custom_skill_uuid && s.custom_skill_uuid.description,
+    custom_skill_effect: s.custom_skill_uuid?.description, // 改成 ?. 比較安全
     trigger_condition: s.passive_trigger && s.passive_trigger.condition,
-    movement_effect_name: s.movement_skill?.move_name   // 新增
+    movement_effect_name: s.movement_skill?.move_name
   }));
 }
+
 
 // 填入資料
 function fillStudentCard(student, skills) {
