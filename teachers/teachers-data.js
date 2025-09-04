@@ -1,5 +1,6 @@
 window.teachers = {
   papa: {
+    title: "教師證",
     bigname: "帕洛斯・特帕爾",
     littlename: "帕帕",
     img: "img/papa.png",
@@ -66,34 +67,11 @@ window.teachers = {
     }
   },
 
-  
- // 再加更多老師範例：
-/* 複製用
- 英文名: {
-  bigname: "角色全名（10字以內）",
-  littlename: "簡稱（可不填）",
-  img: "img/papa.png",
-  bg: "img/18.webp",
-  useDarkBg: true/false , // ture 是黑底  false 是白底
-
-  info: {
-    "陣營": "白色/黑色 陣營",
-    "種族": "最多9字",
-    "年齡": "數字",
-    "性別": "男/女/?",
-    "身高": "數字",
-    "體重": "數字",
-    "個性": `可直接ENTER換行`,
-    "喜歡": "可自由填",
-    "討厭": "可自由填",
-    "角色備註/裏設定": `可直接ENTER換行`,
-    "背景故事/設定": `可直接ENTER換行`
-  }
-},
-
-*/
+ 
 //以下開放新增老師
+//------
  ro: {
+  title: "公務員證",
   bigname: "謝爾夏公務員",
   littlename: "Ｒｏｒｏ",
   img: "img/ro.png",
@@ -122,7 +100,9 @@ window.teachers = {
   }
 },
 
+//-------
 yu: {
+  title: "教師證",
   bigname: "拉斐爾",
   littlename: "優",
   img: "img/yu.png",
@@ -149,28 +129,7 @@ yu: {
 
     "背景故事/設定": `我是個年輕的保健室老師啾咪！！`
   }
-},
-
-
-test: {
-  bigname: "角色全名（10字以內）",
-  littlename: "簡稱（可不填）",
-  img: "img/papa.png",
-  bg: "img/18.webp",
-  useDarkBg: true , // ture 是黑底  false 是白底
-  info: {
-    "陣營": "白色/黑色 陣營",
-    "種族": "最多9字",
-    "年齡": "數字",
-    "性別": "男/女/?",
-    "身高": "數字",
-    "體重": "數字",
-    "個性": `可直接ENTER換行`,
-    "喜歡": "可自由填",
-    "討厭": "可自由填",
-    "角色備註/裏設定": `可直接ENTER換行`,
-    "背景故事/設定": `可直接ENTER換行`
-  }
+}
 }
 
 //結束符號
