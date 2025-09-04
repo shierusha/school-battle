@@ -81,7 +81,7 @@ ro: {
   bigname: "謝爾夏公務員",
   littlename: "Ｒｏｒｏ",
   img: "img/ro.png",
-  bg: "img/19.webp",
+  bg: "img/5.webp",
   useDarkBg: false,
 
   info: {
