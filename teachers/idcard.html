@@ -221,6 +221,12 @@ function applyTeacherData() {
   const teacher = window.teachers?.[teacherId];
   if (!teacher) return;
 
+  // ← 這裡加
+  if (teacher.title) {
+    document.title = teacher.title;
+  } else {
+    document.title = "教師證"; // 預設
+  }
   // 自動控制背景濾鏡
   if (teacher.useDarkBg) {
     document.body.classList.add("dark-bg");
