@@ -106,7 +106,7 @@ ro: {
 
 //-------
 yu: {
-  title: "教師證",
+  title: "",
   bigname: "拉斐爾",
   littlename: "優",
   img: "img/yu.png",
