@@ -1,5 +1,6 @@
 window.teachers = {
   papa: {
+    title: "",
     bigname: "帕洛斯・特帕爾",
     littlename: "帕帕",
     img: "img/papa.png",
