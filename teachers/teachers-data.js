@@ -76,7 +76,7 @@ window.teachers = {
  
 //以下開放新增老師
 //------
-ro: {
+roro: {
   title: "公務員證",
   bigname: "謝爾夏公務員",
   littlename: "Ｒｏｒｏ",
