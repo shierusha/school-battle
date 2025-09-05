@@ -211,7 +211,7 @@ document.getElementById('info-modal').addEventListener('click', function(e) {
 //帶入老師參數
 function applyTeacherData() {
   const urlParams = new URLSearchParams(window.location.search);
-  const teacherId = urlParams.get("idc") || "papa";
+  const teacherId = urlParams.get("idc") || "roro";
   const teacher = window.teachers?.[teacherId];
   if (!teacher) return;
 
