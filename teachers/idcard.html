@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>謝爾夏證件</title>
-  <meta property="og:title" content="謝爾夏證件" id="ogTitle">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://shierusha.github.io/school-battle/teachers/th.css">
 </head>
@@ -217,13 +216,11 @@ function applyTeacherData() {
   if (!teacher) return;
 
   // ← 這裡加
-  if (teacher.title) {
+if (teacher.title) {
   document.title = "謝爾夏 " + teacher.title;
-  document.querySelector('meta[property="og:title"]').setAttribute('content', "謝爾夏 " + teacher.title);
 } else {
-  document.title = "謝爾夏 教師證";
-  document.querySelector('meta[property="og:title"]').setAttribute('content', "謝爾夏 教師證");
-}
+  document.title = "謝爾夏證件";
+}  
 
 
   
