@@ -153,7 +153,14 @@ body {
 }
 .btn-edit { background: #21694b; }
 .btn-link { background: #346689; }
+.btn-link:hover { background:#08304d; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    
+
+ .btn-story { background: #b85c2d; }  /* 橘色，和藍/綠區分 */
+ .btn-story:hover { background:#08304d; } /* 橘色，和藍/綠區分 */
+
 
 /* ---- 響應式 ---- */
 @media (max-width: 900px) {
@@ -248,6 +255,8 @@ body {
   background: none; border: none; font-size: 1.6em; color: #999; cursor: pointer; z-index: 1001;
 }
 .close-btn:hover { color:#e2583e; }
+
+   
 .hint { font-size: 0.95em; color: #888; margin-top: 0.7em; }
 .hr-blue {
   width: 80%;
@@ -356,6 +365,17 @@ function renderStudentList(students) {
     btnCert.innerText = '學生證';
     btnCert.onclick = ()=>window.open(`https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}`,'_blank');
     btnGroup.appendChild(btnCert);
+
+    
+/* ★ 新增：故事集按鈕（橘色） */
+let btnStory = document.createElement('button');
+btnStory.className = 'btn btn-story';
+btnStory.innerText = '故事集';
+btnStory.onclick = ()=>window.open(
+  `https://shierusha.github.io/library/story/story?stu=${encodeURIComponent(stu.student_code)}`,
+  '_blank'
+);
+btnGroup.appendChild(btnStory);
 
     // 卡片排版
     let cardRow = document.createElement('div');
