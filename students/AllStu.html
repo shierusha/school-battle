@@ -317,7 +317,10 @@ async function getAllStudents() {
     .select('student_id,name,student_code,alignment')
     .not('student_code', 'is', null);
 
-  students = (students || []).filter(s => passedMap[s.student_id]);
+  const numberOnly = /^[0-9]+$/;
+  students = (students || [])
+    .filter(s => passedMap[s.student_id] && numberOnly.test(s.student_code));
+
   students.sort((a, b) => (+a.student_code) - (+b.student_code));
 
   let { data: imgs } = await client.from('student_images')
