@@ -138,8 +138,19 @@ function fillStudentCard(student, skills) {
   });
 
   document.querySelectorAll('[data-key="students.student_code"]').forEach(el => el.innerText = student.student_code);
-  document.querySelectorAll('[data-key="students.name"]').forEach(el => el.innerText = student.name);
-document.querySelectorAll('[data-key="students.nickname"]').forEach(el => {
+
+  document.querySelectorAll('[data-key="students.name"]').forEach(el => {
+  el.innerText = student.name || "";
+
+  if (student.hide_name === true) {
+    el.classList.add('bigname-no');
+  } else {
+    el.classList.remove('bigname-no');
+  }
+});
+
+  
+  document.querySelectorAll('[data-key="students.nickname"]').forEach(el => {
   if (!student.nickname) {
     el.parentElement.style.display = 'none';
     el.innerText = "";
