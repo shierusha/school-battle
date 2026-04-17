@@ -23,6 +23,12 @@ const GENDER_MAP = { M: "男", F: "女", O: "其他" };
 const ALIGNMENT_MAP = { white: "白", black: "黑" };
 const ELEMENT_MAP = { fire: "火", water: "水", ice: "冰", wind: "風", earth: "土", thunder: "雷", dark: "暗", light: "光" };
 const RANGE_MAP = { same_zone: "近距離", cross_zone: "遠距離", all_zone: "遠近皆可" };
+
+function mapSkillRange(val) {
+  if (val === null) return "全域攻擊";
+  return RANGE_MAP[val] || val;
+}
+
 const ROLE_MAP = { melee: "近戰攻擊手", ranger: "遠攻攻擊手", balance: "普通攻擊手" };
 const POSITION_MAP = { close: "近戰區", far: "遠攻區" };
 
@@ -197,7 +203,7 @@ document.querySelectorAll('[data-key="students.element"]').forEach(el => { el.in
       else if (val > 1) el.innerText = `範圍(${val})`;
       else el.innerText = "";
     });
-    document.querySelectorAll(`[data-key="student_skills.${i + 1}.range"]`).forEach(el => el.innerText = mapEnum(skill.range, RANGE_MAP));
+document.querySelectorAll(`[data-key="student_skills.${i + 1}.range"]`).forEach(el => el.innerText = mapSkillRange(skill.range));
     document.querySelectorAll(`[data-key="student_skills.${i + 1}.description"]`).forEach(el => {
       if (skill.is_passive && skill.trigger_condition) {
         el.innerText = `${skill.description || ""}\n\n條件：${skill.trigger_condition}`;
