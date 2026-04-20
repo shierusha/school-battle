@@ -52,12 +52,6 @@ const RANGE_MAP = {
   all_zone: '遠近皆可'
 };
 
-const TARGET_SELECT_TYPE_MAP = {
-  people: '人頭',
-  range: '區域',
-  global: '全場'
-};
-
 const APPLIED_TO_MAP = {
   self: '自身',
   target: '目標',
@@ -241,6 +235,54 @@ async function fetchNpcData(npcName) {
   return data || null;
 }
 
+async function fetchNpcMovementRows(skills) {
+  const movementIds = [...new Set(
+    (skills || [])
+      .map(skill => skill.linked_movement_id)
+      .filter(Boolean)
+  )];
+
+  if (movementIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await window.client
+    .from('movement_skills')
+    .select('move_id,move_name,description')
+    .in('move_id', movementIds);
+
+  if (error) {
+    console.error('NPC 移動技能查詢失敗', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+async function fetchNpcTriggerRows(skills) {
+  const triggerIds = [...new Set(
+    (skills || [])
+      .map(skill => skill.othernpc_trigger_id)
+      .filter(Boolean)
+  )];
+
+  if (triggerIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await window.client
+    .from('othernpc_passive_trigger')
+    .select('othernpc_trigger_id,condition,trigger_code,remarks')
+    .in('othernpc_trigger_id', triggerIds);
+
+  if (error) {
+    console.error('NPC 被動觸發條件查詢失敗', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 async function fetchNpcSkills(othernpcId) {
   const { data: skills, error } = await window.client
     .from('othernpc_skills')
@@ -265,8 +307,8 @@ async function fetchNpcSkills(othernpcId) {
     sharedLinksResult,
     npcLinksResult,
     debuffLinksResult,
-    movementResult,
-    triggerResult
+    movementRows,
+    triggerRows
   ] = await Promise.all([
     window.client
       .from('othernpc_skill_effect_links')
@@ -291,8 +333,6 @@ async function fetchNpcSkills(othernpcId) {
   const sharedLinks = sharedLinksResult.data || [];
   const npcLinks = npcLinksResult.data || [];
   const debuffLinks = debuffLinksResult.data || [];
-  const movementRows = movementResult || [];
-  const triggerRows = triggerResult || [];
 
   const sharedEffectIds = [...new Set(sharedLinks.map(link => link.effect_id).filter(Boolean))];
   const npcEffectIds = [...new Set(npcLinks.map(link => link.npc_effect_id).filter(Boolean))];
@@ -328,8 +368,8 @@ async function fetchNpcSkills(othernpcId) {
   const sharedEffectMap = indexBy(sharedEffectsResult.data || [], 'effect_id');
   const npcEffectMap = indexBy(npcEffectsResult.data || [], 'effect_id');
   const debuffMap = indexBy(debuffsResult.data || [], 'debuff_id');
-  const movementMap = indexBy(movementRows, 'move_id');
-  const triggerMap = indexBy(triggerRows, 'othernpc_trigger_id');
+  const movementMap = indexBy(movementRows || [], 'move_id');
+  const triggerMap = indexBy(triggerRows || [], 'othernpc_trigger_id');
 
   return skills.map(skill => {
     const skillSharedLinks = sharedLinks.filter(link => link.skill_id === skill.id);
@@ -380,54 +420,6 @@ async function fetchNpcSkills(othernpcId) {
       trigger_remarks: trigger ? trigger.remarks : ''
     };
   });
-}
-
-async function fetchNpcMovementRows(skills) {
-  const movementIds = [...new Set(
-    (skills || [])
-      .map(skill => skill.linked_movement_id)
-      .filter(Boolean)
-  )];
-
-  if (movementIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await window.client
-    .from('movement_skills')
-    .select('move_id,move_name,description')
-    .in('move_id', movementIds);
-
-  if (error) {
-    console.error('NPC 移動技能查詢失敗', error);
-    return [];
-  }
-
-  return data || [];
-}
-
-async function fetchNpcTriggerRows(skills) {
-  const triggerIds = [...new Set(
-    (skills || [])
-      .map(skill => skill.othernpc_trigger_id)
-      .filter(Boolean)
-  )];
-
-  if (triggerIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await window.client
-    .from('othernpc_passive_trigger')
-    .select('othernpc_trigger_id,condition,trigger_code,remarks')
-    .in('othernpc_trigger_id', triggerIds);
-
-  if (error) {
-    console.error('NPC 被動觸發條件查詢失敗', error);
-    return [];
-  }
-
-  return data || [];
 }
 
 function fillNpcImages(npc) {
@@ -592,11 +584,13 @@ function fillNpcCard(npc, skills) {
 
     if (npc.nickname && npc.nickname.trim()) {
       box.style.display = '';
+
       if (nickElement) {
         nickElement.textContent = npc.nickname;
       }
     } else {
       box.style.display = 'none';
+
       if (nickElement) {
         nickElement.textContent = '';
       }
@@ -667,16 +661,6 @@ function setInfoBoxFontSize() {
   });
 }
 
-function setFlipBtnFontSize() {
-  document.querySelectorAll('.row-flip-btn').forEach(box => {
-    const btn = box.querySelector('.flip-btn');
-    if (!btn) return;
-
-    const fontSize = Math.max(box.offsetHeight * 0.6);
-    btn.style.fontSize = fontSize + 'px';
-  });
-}
-
 function setStudentIdFontSize() {
   document.querySelectorAll('.student-id').forEach(box => {
     const fontSize = Math.max(box.offsetHeight * 0.7);
@@ -687,7 +671,6 @@ function setStudentIdFontSize() {
 function fitAll() {
   fitAllNameBoxes();
   setInfoBoxFontSize();
-  setFlipBtnFontSize();
   setStudentIdFontSize();
 }
 
@@ -747,34 +730,6 @@ function bindFlipEvents() {
   if (!flipCard) {
     return;
   }
-
-  document.querySelectorAll('.flip-btn').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      flipCard.classList.toggle('flipped');
-    });
-  });
-
-  document.addEventListener('click', function (e) {
-    const modal = document.getElementById('info-modal');
-    const isModalOpen = modal && getComputedStyle(modal).display !== 'none';
-
-    if (isModalOpen) {
-      return;
-    }
-
-    if (!e.target.closest('#flipCard')) {
-      flipCard.classList.toggle('flipped');
-    }
-  });
-}
-
-  flipButtons.forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      flipCard.classList.toggle('flipped');
-    });
-  });
 
   document.addEventListener('click', function (e) {
     const modal = document.getElementById('info-modal');
