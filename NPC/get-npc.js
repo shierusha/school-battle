@@ -743,11 +743,31 @@ function bindModalClose() {
 
 function bindFlipEvents() {
   const flipCard = document.getElementById('flipCard');
-  const flipButtons = document.querySelectorAll('.flip-btn');
 
-  if (!flipCard || flipButtons.length === 0) {
+  if (!flipCard) {
     return;
   }
+
+  document.querySelectorAll('.flip-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      flipCard.classList.toggle('flipped');
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    const modal = document.getElementById('info-modal');
+    const isModalOpen = modal && getComputedStyle(modal).display !== 'none';
+
+    if (isModalOpen) {
+      return;
+    }
+
+    if (!e.target.closest('#flipCard')) {
+      flipCard.classList.toggle('flipped');
+    }
+  });
+}
 
   flipButtons.forEach(btn => {
     btn.addEventListener('click', function (e) {
