@@ -285,6 +285,16 @@ const client = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmaHdodm9kZ2lrcGR1Y3JoZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTAwNjEsImV4cCI6MjA2MzU4NjA2MX0.P6P-x4SxjiR4VdWH6VFgY_ktgMac_OzuI4Bl7HWskz8'
 );
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
 // ==== 頭像裁切邏輯保留原樣 ====
 function getAvatarFromUrl(url, callback) {
   let avatarCanvas = document.createElement('canvas');
@@ -314,7 +324,7 @@ async function getAllStudents() {
 
   // 這裡有加上 alignment 欄位
   let { data: students } = await client.from('students')
-    .select('student_id,name,student_code,alignment')
+    .select('student_id,name,nickname,hide_name,student_code,alignment')
     .not('student_code', 'is', null);
 
   const numberOnly = /^[0-9]+$/;
@@ -357,19 +367,23 @@ function renderStudentList(students) {
     );
     avatarDiv.appendChild(avatarImg);
 
-    // 右側資訊區（只NO. 學號、本名、學生證按鈕）
+    // 右側資訊區（只NO. 學號、顯示名稱、學生證按鈕）
+    const displayName = stu.hide_name === true
+      ? (stu.nickname || stu.name || '')
+      : (stu.name || '');
+
     let infoDiv = document.createElement('div');
     infoDiv.className = 'student-info';
     infoDiv.innerHTML =
-      `<div class="student-code">NO. ${stu.student_code}</div>
-       <div class="student-name">${stu.name}</div>`;
+      `<div class="student-code">NO. ${escapeHtml(stu.student_code)}</div>
+       <div class="student-name">${escapeHtml(displayName)}</div>`;
 
     // 學生證按鈕
     let btnGroup = document.createElement('div');
     btnGroup.className = 'card-btn-group';
     let btnCert = document.createElement('button');
     btnCert.className = 'btn btn-link';
-    btnCert.innerText = '學生證';
+    btnCert.innerText = '學生資訊(中之視角)';
     btnCert.onclick = ()=>window.open(`https://shierusha.github.io/school-battle/students/st-idcard?stu=${stu.student_code}`,'_blank');
     btnGroup.appendChild(btnCert);
 
@@ -377,7 +391,7 @@ function renderStudentList(students) {
 /* ★ 新增：故事集按鈕（橘色） */
 let btnStory = document.createElement('button');
 btnStory.className = 'btn btn-story';
-btnStory.innerText = '故事集';
+btnStory.innerText = '相關故事集';
 btnStory.onclick = ()=>window.open(
   `https://shierusha.github.io/library/story/story?stu=${encodeURIComponent(stu.student_code)}`,
   '_blank'
