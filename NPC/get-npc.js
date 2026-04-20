@@ -54,7 +54,6 @@ const RANGE_MAP = {
 
 const APPLIED_TO_MAP = {
   self: '自身',
-  target: '目標',
   enemy: '敵方',
   ally: '隊友'
 };
@@ -125,15 +124,35 @@ function mapEnum(value, mapObject) {
   return mapObject[value] || value;
 }
 
+function mapEnumWithEmpty(value, mapObject, emptyText) {
+  if (value === null || value === undefined || value === '') {
+    return emptyText;
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return emptyText;
+    }
+
+    return value
+      .map(item => mapObject[item] || item)
+      .filter(Boolean)
+      .join(' / ');
+  }
+
+  return mapObject[value] || value;
+}
+
 function mapNpcSkillRange(skill) {
   if (!skill) return '';
 
-  if (skill.target_select_type === 'global' || skill.range === null) {
+  if (
+    skill.target_select_type === 'global' ||
+    skill.range === null ||
+    skill.range === undefined ||
+    skill.range === ''
+  ) {
     return '全域攻擊';
-  }
-
-  if (skill.range === undefined || skill.range === '') {
-    return '';
   }
 
   return RANGE_MAP[skill.range] || skill.range;
@@ -182,7 +201,11 @@ function mapNpcMaxTargets(skill) {
 }
 
 function mapAppliedTo(value) {
-  return APPLIED_TO_MAP[value] || '';
+  if (value === null || value === undefined || value === '') {
+    return '敵我不分';
+  }
+
+  return APPLIED_TO_MAP[value] || value;
 }
 
 function setTextByDataKey(dataKey, value) {
@@ -487,7 +510,7 @@ function buildSkillEffectText(skill) {
   if (Array.isArray(skill.debuffs)) {
     skill.debuffs.forEach(debuff => {
       if (debuff && debuff.name) {
-        lines.push(`# ${debuff.applied_to || ''}${debuff.name}`);
+        lines.push(`# ${debuff.applied_to}${debuff.name}`);
       }
     });
   }
@@ -563,7 +586,7 @@ function fillNpcCard(npc, skills) {
 
   setTextByDataKey('other_npcs.npc_category', npc.npc_category || '');
   setTextByDataKey('other_npcs.name', npc.name || '');
-  setTextByDataKey('other_npcs.alignment', mapEnum(npc.alignment, ALIGNMENT_MAP));
+  setTextByDataKey('other_npcs.alignment', mapEnumWithEmpty(npc.alignment, ALIGNMENT_MAP, '?'));
   setTextByDataKey('other_npcs.race', npc.race || '');
   setTextByDataKey('other_npcs.age', npc.age || '');
   setTextByDataKey('other_npcs.gender', mapEnum(npc.gender, GENDER_MAP));
@@ -574,10 +597,10 @@ function fillNpcCard(npc, skills) {
   setTextByDataKey('other_npcs.hate', npc.hate || '');
   setTextByDataKey('other_npcs.background', npc.background || '');
   setTextByDataKey('other_npcs.occupation_type', mapEnum(npc.occupation_type, OCCUPATION_MAP));
-  setTextByDataKey('other_npcs.element', npc.element ? mapEnum(npc.element, ELEMENT_MAP) : '無');
+  setTextByDataKey('other_npcs.element', mapEnumWithEmpty(npc.element, ELEMENT_MAP, '無'));
   setTextByDataKey('element_weakness.element', npc.element_weakness && npc.element_weakness.element ? mapEnum(npc.element_weakness.element, ELEMENT_MAP) : '無');
   setTextByDataKey('other_npcs.preferred_role', mapEnum(npc.preferred_role, ROLE_MAP));
-  setTextByDataKey('other_npcs.starting_position', npc.starting_position ? mapEnum(npc.starting_position, POSITION_MAP) : '無');
+  setTextByDataKey('other_npcs.starting_position', mapEnumWithEmpty(npc.starting_position, POSITION_MAP, '無'));
 
   document.querySelectorAll('.littlename-box').forEach(box => {
     const nickElement = box.querySelector('[data-key="other_npcs.nickname"]');
