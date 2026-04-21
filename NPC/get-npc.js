@@ -201,11 +201,11 @@ function mapNpcMaxTargets(skill) {
 }
 
 function mapAppliedTo(value) {
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === '' || value === 'target') {
     return '敵我不分';
   }
 
-  return APPLIED_TO_MAP[value] || value;
+  return APPLIED_TO_MAP[value] || '敵我不分';
 }
 
 function setTextByDataKey(dataKey, value) {
@@ -600,7 +600,7 @@ function fillNpcCard(npc, skills) {
   setTextByDataKey('other_npcs.element', mapEnumWithEmpty(npc.element, ELEMENT_MAP, '無'));
   setTextByDataKey('element_weakness.element', npc.element_weakness && npc.element_weakness.element ? mapEnum(npc.element_weakness.element, ELEMENT_MAP) : '無');
   setTextByDataKey('other_npcs.preferred_role', mapEnum(npc.preferred_role, ROLE_MAP));
-  setTextByDataKey('other_npcs.starting_position', mapEnumWithEmpty(npc.starting_position, POSITION_MAP, '無'));
+  setTextByDataKey('other_npcs.starting_position', mapEnumWithEmpty(npc.starting_position, POSITION_MAP, '可近可遠'));
 
   document.querySelectorAll('.littlename-box').forEach(box => {
     const nickElement = box.querySelector('[data-key="other_npcs.nickname"]');
@@ -624,24 +624,8 @@ function fillNpcCard(npc, skills) {
   fillNpcSkillSlot(1, skills[0] || null);
   fillNpcSkillSlot(2, skills[1] || null);
   fillNpcExtraSkills(skills);
-
-  if (typeof fitAll === 'function') {
-    fitAll();
-  }
-
-  if (typeof checkLongTextByCharCount === 'function') {
-    checkLongTextByCharCount(11);
-  }
-
-  setTimeout(() => {
-    if (typeof fitAll === 'function') {
-      fitAll();
-    }
-
-    if (typeof checkLongTextByCharCount === 'function') {
-      checkLongTextByCharCount(11);
-    }
-  }, 80);
+  bindImageFitEvents();
+  runNpcFitAll();
 }
 
 function setNameFontSize(selector, maxChars) {
@@ -649,7 +633,10 @@ function setNameFontSize(selector, maxChars) {
     const nameDiv = box.querySelector('.name-box');
     if (!nameDiv) return;
 
-    const fontSize = box.offsetHeight / maxChars * 0.98;
+    const rect = box.getBoundingClientRect();
+    if (!rect.height) return;
+
+    const fontSize = rect.height / maxChars * 0.98;
     nameDiv.style.fontSize = fontSize + 'px';
   });
 }
@@ -660,33 +647,29 @@ function fitAllNameBoxes() {
 }
 
 function setInfoBoxFontSize() {
-  const infoBoxes = document.querySelectorAll('.info-box');
-  if (!infoBoxes.length) return;
+  const boxes = Array.from(document.querySelectorAll('.info-box'));
+  const heights = boxes
+    .map(box => box.getBoundingClientRect().height)
+    .filter(height => height > 0);
 
-  let minHeight = Infinity;
-
-  infoBoxes.forEach(box => {
-    const h = box.offsetHeight;
-
-    if (h > 0 && h < minHeight) {
-      minHeight = h;
-    }
-  });
-
-  if (!Number.isFinite(minHeight)) {
+  if (heights.length === 0) {
     return;
   }
 
+  const minHeight = Math.min(...heights);
   const fontSize = minHeight * 0.62;
 
-  infoBoxes.forEach(box => {
+  boxes.forEach(box => {
     box.style.fontSize = fontSize + 'px';
   });
 }
 
 function setStudentIdFontSize() {
   document.querySelectorAll('.student-id').forEach(box => {
-    const fontSize = Math.max(box.offsetHeight * 0.7);
+    const rect = box.getBoundingClientRect();
+    if (!rect.height) return;
+
+    const fontSize = rect.height * 0.7;
     box.style.fontSize = fontSize + 'px';
   });
 }
@@ -695,6 +678,54 @@ function fitAll() {
   fitAllNameBoxes();
   setInfoBoxFontSize();
   setStudentIdFontSize();
+}
+
+function runNpcFitAll() {
+  fitAll();
+  checkLongTextByCharCount(11);
+
+  requestAnimationFrame(() => {
+    fitAll();
+    checkLongTextByCharCount(11);
+
+    requestAnimationFrame(() => {
+      fitAll();
+      checkLongTextByCharCount(11);
+    });
+  });
+
+  setTimeout(() => {
+    fitAll();
+    checkLongTextByCharCount(11);
+  }, 120);
+
+  setTimeout(() => {
+    fitAll();
+    checkLongTextByCharCount(11);
+  }, 360);
+
+  setTimeout(() => {
+    fitAll();
+    checkLongTextByCharCount(11);
+  }, 720);
+}
+
+function bindImageFitEvents() {
+  document.querySelectorAll('img').forEach(img => {
+    if (img.dataset.npcFitBound === 'true') {
+      return;
+    }
+
+    img.dataset.npcFitBound = 'true';
+
+    img.addEventListener('load', function () {
+      runNpcFitAll();
+    });
+
+    img.addEventListener('error', function () {
+      runNpcFitAll();
+    });
+  });
 }
 
 function showInfoModal(title, content) {
@@ -743,6 +774,7 @@ function bindModalClose() {
     if (e.target === this) {
       e.stopPropagation();
       this.style.display = 'none';
+      runNpcFitAll();
     }
   });
 }
@@ -764,6 +796,7 @@ function bindFlipEvents() {
 
     if (!e.target.closest('#flipCard')) {
       flipCard.classList.toggle('flipped');
+      runNpcFitAll();
     }
   });
 }
@@ -791,16 +824,31 @@ async function initNpcCardPage() {
 window.addEventListener('DOMContentLoaded', function () {
   bindModalClose();
   bindFlipEvents();
-  fitAll();
+  bindImageFitEvents();
+  runNpcFitAll();
   initNpcCardPage();
 });
 
 window.addEventListener('resize', function () {
-  fitAll();
-  checkLongTextByCharCount(11);
+  runNpcFitAll();
+});
+
+window.addEventListener('orientationchange', function () {
+  runNpcFitAll();
 });
 
 window.addEventListener('load', function () {
-  fitAll();
-  checkLongTextByCharCount(11);
+  runNpcFitAll();
 });
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', function () {
+    runNpcFitAll();
+  });
+}
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function () {
+    runNpcFitAll();
+  });
+}
