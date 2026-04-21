@@ -652,15 +652,50 @@ function fillNpcCard(npc, skills) {
   runNpcFitAll();
 }
 
+function getLayoutHeight(element) {
+  if (!element) {
+    return 0;
+  }
+
+  if (element.clientHeight > 0) {
+    return element.clientHeight;
+  }
+
+  if (element.offsetHeight > 0) {
+    return element.offsetHeight;
+  }
+
+  const computedStyle = window.getComputedStyle(element);
+  const computedHeight = parseFloat(computedStyle.height);
+
+  if (Number.isFinite(computedHeight) && computedHeight > 0) {
+    return computedHeight;
+  }
+
+  const rect = element.getBoundingClientRect();
+
+  if (rect.height > 0) {
+    return rect.height;
+  }
+
+  return 0;
+}
+
 function setNameFontSize(selector, maxChars) {
   document.querySelectorAll(selector).forEach(box => {
     const nameDiv = box.querySelector('.name-box');
-    if (!nameDiv) return;
 
-    const rect = box.getBoundingClientRect();
-    if (!rect.height) return;
+    if (!nameDiv) {
+      return;
+    }
 
-    const fontSize = rect.height / maxChars * 0.98;
+    const height = getLayoutHeight(box);
+
+    if (!height) {
+      return;
+    }
+
+    const fontSize = height / maxChars * 0.98;
     nameDiv.style.fontSize = fontSize + 'px';
   });
 }
@@ -673,7 +708,7 @@ function fitAllNameBoxes() {
 function setInfoBoxFontSize() {
   const boxes = Array.from(document.querySelectorAll('.info-box'));
   const heights = boxes
-    .map(box => box.getBoundingClientRect().height)
+    .map(box => getLayoutHeight(box))
     .filter(height => height > 0);
 
   if (heights.length === 0) {
@@ -690,10 +725,13 @@ function setInfoBoxFontSize() {
 
 function setStudentIdFontSize() {
   document.querySelectorAll('.student-id').forEach(box => {
-    const rect = box.getBoundingClientRect();
-    if (!rect.height) return;
+    const height = getLayoutHeight(box);
 
-    const fontSize = rect.height * 0.7;
+    if (!height) {
+      return;
+    }
+
+    const fontSize = height * 0.7;
     box.style.fontSize = fontSize + 'px';
   });
 }
