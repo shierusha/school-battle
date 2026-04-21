@@ -657,6 +657,8 @@ function fillNpcCard(npc, skills) {
   if (typeof checkLongTextByCharCount === 'function') {
     checkLongTextByCharCount(11);
   }
+
+  runNpcFinalFitAll();
 }
 
 function setNameFontSize(selector, maxChars) {
@@ -711,6 +713,24 @@ function fitAll() {
   setStudentIdFontSize();
 }
 
+let npcFinalFitTimer = null;
+
+function runNpcFinalFitAll() {
+  if (npcFinalFitTimer) {
+    clearTimeout(npcFinalFitTimer);
+  }
+
+  npcFinalFitTimer = setTimeout(() => {
+    if (typeof fitAll === 'function') {
+      fitAll();
+    }
+
+    if (typeof checkLongTextByCharCount === 'function') {
+      checkLongTextByCharCount(11);
+    }
+  }, 1800);
+}
+
 function runNpcFitAll() {
   if (typeof fitAll === 'function') {
     fitAll();
@@ -719,6 +739,8 @@ function runNpcFitAll() {
   if (typeof checkLongTextByCharCount === 'function') {
     checkLongTextByCharCount(11);
   }
+
+  runNpcFinalFitAll();
 }
 
 function bindImageFitEvents() {
