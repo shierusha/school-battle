@@ -66,7 +66,11 @@ window.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function getNpcParam() {
   const url = new URL(location.href);
-  return (url.searchParams.get('npc') || '').trim();
+  return (
+    url.searchParams.get('oc') ||
+    url.searchParams.get('npc') ||
+    ''
+  ).trim();
 }
 
 function bustCache(url) {
