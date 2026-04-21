@@ -64,6 +64,9 @@ const APPLIED_TO_MAP = {
 
 window.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let npcFitTimerList = [];
+let npcPageInitialized = false;
+
 function getNpcParam() {
   const url = new URL(location.href);
   return (
@@ -74,7 +77,10 @@ function getNpcParam() {
 }
 
 function bustCache(url) {
-  if (!url) return '';
+  if (!url) {
+    return '';
+  }
+
   return url + (url.includes('?') ? '&v=' : '?v=') + Date.now();
 }
 
@@ -152,7 +158,9 @@ function mapEnumWithEmpty(value, mapObject, emptyText) {
 }
 
 function mapNpcSkillRange(skill) {
-  if (!skill) return '';
+  if (!skill) {
+    return '';
+  }
 
   if (
     skill.target_select_type === 'global' ||
@@ -167,7 +175,9 @@ function mapNpcSkillRange(skill) {
 }
 
 function mapNpcMaxTargets(skill) {
-  if (!skill) return '';
+  if (!skill) {
+    return '';
+  }
 
   if (skill.target_select_type === 'global') {
     return '全場';
@@ -243,10 +253,11 @@ function setImageByDataKey(dataKey, imageUrl) {
     if (imageUrl) {
       el.src = bustCache(imageUrl);
       el.style.display = '';
-    } else {
-      el.removeAttribute('src');
-      el.style.display = 'none';
+      return;
     }
+
+    el.removeAttribute('src');
+    el.style.display = 'none';
   });
 }
 
@@ -607,8 +618,8 @@ function fillNpcCard(npc, skills) {
   setNpcNameboxColor(npc.namebox_color || DEFAULT_NPC_NAMEBOX_COLOR);
 
   fillNpcImages(npc);
-
   setNpcCategoryStudentId(npc.npc_category);
+
   setTextByDataKey('other_npcs.name', npc.name || '');
   setTextByDataKey('other_npcs.alignment', mapEnumWithEmpty(npc.alignment, ALIGNMENT_MAP, '?'));
   setTextByDataKey('other_npcs.race', npc.race || '');
@@ -635,12 +646,14 @@ function fillNpcCard(npc, skills) {
       if (nickElement) {
         nickElement.textContent = npc.nickname;
       }
-    } else {
-      box.style.display = 'none';
 
-      if (nickElement) {
-        nickElement.textContent = '';
-      }
+      return;
+    }
+
+    box.style.display = 'none';
+
+    if (nickElement) {
+      nickElement.textContent = '';
     }
   });
 
@@ -649,25 +662,97 @@ function fillNpcCard(npc, skills) {
   fillNpcSkillSlot(2, skills[1] || null);
   fillNpcExtraSkills(skills);
   bindImageFitEvents();
+  runNpcFitAll();
+}
 
-  if (typeof fitAll === 'function') {
-    fitAll();
+function getElementHeight(element) {
+  if (!element) {
+    return 0;
   }
 
-  if (typeof checkLongTextByCharCount === 'function') {
-    checkLongTextByCharCount(11);
+  return element.offsetHeight || element.getBoundingClientRect().height || 0;
+}
+
+function getElementWidth(element) {
+  if (!element) {
+    return 0;
   }
 
-  runNpcFinalFitAll();
+  return element.offsetWidth || element.getBoundingClientRect().width || 0;
+}
+
+function isElementVisible(element) {
+  if (!element) {
+    return false;
+  }
+
+  if (element.style.display === 'none') {
+    return false;
+  }
+
+  return element.getClientRects().length > 0;
+}
+
+function isTextOverflowing(target, container) {
+  if (!target || !container) {
+    return false;
+  }
+
+  const targetRect = target.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  const scrollOverflow =
+    target.scrollHeight > target.clientHeight + 1 ||
+    target.scrollWidth > target.clientWidth + 1;
+
+  const rectOverflow =
+    targetRect.height > containerRect.height + 1 ||
+    targetRect.width > containerRect.width + 1;
+
+  return scrollOverflow || rectOverflow;
+}
+
+function fitTextToBox(target, container, startSize, minSize) {
+  if (!target || !container || !isElementVisible(container)) {
+    return;
+  }
+
+  const safeStartSize = Number.isFinite(startSize) && startSize > 0 ? startSize : 12;
+  const safeMinSize = Number.isFinite(minSize) && minSize > 0 ? minSize : 6;
+
+  let fontSize = Math.max(safeStartSize, safeMinSize);
+
+  target.style.fontSize = fontSize + 'px';
+
+  let guard = 0;
+
+  while (
+    guard < 48 &&
+    fontSize > safeMinSize &&
+    isTextOverflowing(target, container)
+  ) {
+    fontSize = Math.max(safeMinSize, fontSize - Math.max(0.5, fontSize * 0.055));
+    target.style.fontSize = fontSize + 'px';
+    guard += 1;
+  }
 }
 
 function setNameFontSize(selector, maxChars) {
   document.querySelectorAll(selector).forEach(box => {
     const nameDiv = box.querySelector('.name-box');
-    if (!nameDiv) return;
 
-    const fontSize = box.offsetHeight / maxChars * 0.98;
-    nameDiv.style.fontSize = fontSize + 'px';
+    if (!nameDiv) {
+      return;
+    }
+
+    const boxHeight = getElementHeight(box);
+
+    if (!boxHeight) {
+      return;
+    }
+
+    const baseFontSize = boxHeight / maxChars * 0.98;
+    fitTextToBox(nameDiv, box, baseFontSize, 6);
   });
 }
 
@@ -677,70 +762,117 @@ function fitAllNameBoxes() {
 }
 
 function setInfoBoxFontSize() {
-  const infoBoxes = document.querySelectorAll('.info-box');
+  const infoBoxes = Array.from(document.querySelectorAll('.info-box'))
+    .filter(box => isElementVisible(box));
 
   if (!infoBoxes.length) {
     return;
   }
 
-  let minHeight = Infinity;
+  const heights = infoBoxes
+    .map(box => getElementHeight(box))
+    .filter(height => height > 0);
 
-  infoBoxes.forEach(box => {
-    const height = box.offsetHeight;
+  if (!heights.length) {
+    return;
+  }
 
-    if (height < minHeight) {
-      minHeight = height;
-    }
-  });
-
-  const fontSize = minHeight * 0.62;
+  let fontSize = Math.min(...heights) * 0.62;
 
   infoBoxes.forEach(box => {
     box.style.fontSize = fontSize + 'px';
+  });
+
+  let guard = 0;
+
+  while (
+    guard < 48 &&
+    fontSize > 6 &&
+    infoBoxes.some(box => isTextOverflowing(box, box))
+  ) {
+    fontSize = Math.max(6, fontSize - Math.max(0.5, fontSize * 0.055));
+
+    infoBoxes.forEach(box => {
+      box.style.fontSize = fontSize + 'px';
+    });
+
+    guard += 1;
+  }
+}
+
+function setFlipBtnFontSize() {
+  document.querySelectorAll('.row-flip-btn').forEach(box => {
+    const btn = box.querySelector('.flip-btn');
+
+    if (!btn) {
+      return;
+    }
+
+    const boxHeight = getElementHeight(box);
+
+    if (!boxHeight) {
+      return;
+    }
+
+    fitTextToBox(btn, box, boxHeight * 0.6, 6);
   });
 }
 
 function setStudentIdFontSize() {
   document.querySelectorAll('.student-id').forEach(box => {
-    const fontSize = box.offsetHeight * 0.7;
-    box.style.fontSize = fontSize + 'px';
+    if (!isElementVisible(box)) {
+      return;
+    }
+
+    const boxHeight = getElementHeight(box);
+
+    if (!boxHeight) {
+      return;
+    }
+
+    fitTextToBox(box, box, boxHeight * 0.7, 6);
   });
 }
 
 function fitAll() {
   fitAllNameBoxes();
   setInfoBoxFontSize();
+  setFlipBtnFontSize();
   setStudentIdFontSize();
 }
 
-let npcFinalFitTimer = null;
+function runNpcFitAll() {
+  fitAll();
+  checkLongTextByCharCount(11);
 
-function runNpcFinalFitAll() {
-  if (npcFinalFitTimer) {
-    clearTimeout(npcFinalFitTimer);
-  }
+  clearNpcFitTimers();
 
-  npcFinalFitTimer = setTimeout(() => {
-    if (typeof fitAll === 'function') {
+  requestAnimationFrame(() => {
+    fitAll();
+    checkLongTextByCharCount(11);
+
+    requestAnimationFrame(() => {
       fitAll();
-    }
-
-    if (typeof checkLongTextByCharCount === 'function') {
       checkLongTextByCharCount(11);
-    }
-  }, 1800);
+    });
+  });
+
+  [120, 360, 720, 1200].forEach(delay => {
+    const timerId = setTimeout(() => {
+      fitAll();
+      checkLongTextByCharCount(11);
+    }, delay);
+
+    npcFitTimerList.push(timerId);
+  });
 }
 
-function runNpcFitAll() {
-  if (typeof fitAll === 'function') {
-    fitAll();
-  }
+function clearNpcFitTimers() {
+  npcFitTimerList.forEach(timerId => {
+    clearTimeout(timerId);
+  });
 
-  if (typeof checkLongTextByCharCount === 'function') {
-    checkLongTextByCharCount(11);
-  }
-
-  runNpcFinalFitAll();
+  npcFitTimerList = [];
 }
 
 function bindImageFitEvents() {
@@ -780,7 +912,9 @@ function checkLongTextByCharCount(maxCount = 11) {
     const value = box.querySelector('.info-value');
     const btn = box.querySelector('.show-more-btn');
 
-    if (!value || !btn) return;
+    if (!value || !btn) {
+      return;
+    }
 
     if ((value.innerText || '').trim().length > maxCount) {
       btn.style.display = 'block';
@@ -789,19 +923,23 @@ function checkLongTextByCharCount(maxCount = 11) {
         const title = this.dataset.title || box.querySelector('.info-label')?.innerText || '內容';
         showInfoModal(title, value.innerText || value.textContent || '');
       };
-    } else {
-      btn.style.display = 'none';
-      btn.onclick = null;
+
+      return;
     }
+
+    btn.style.display = 'none';
+    btn.onclick = null;
   });
 }
 
 function bindModalClose() {
   const modal = document.getElementById('info-modal');
 
-  if (!modal) {
+  if (!modal || modal.dataset.npcModalBound === 'true') {
     return;
   }
+
+  modal.dataset.npcModalBound = 'true';
 
   modal.addEventListener('click', function (e) {
     if (e.target === this) {
@@ -815,9 +953,19 @@ function bindModalClose() {
 function bindFlipEvents() {
   const flipCard = document.getElementById('flipCard');
 
-  if (!flipCard) {
+  if (!flipCard || document.body.dataset.npcFlipBound === 'true') {
     return;
   }
+
+  document.body.dataset.npcFlipBound = 'true';
+
+  document.querySelectorAll('.flip-btn').forEach(btn => {
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      flipCard.classList.toggle('flipped');
+      runNpcFitAll();
+    });
+  });
 
   document.addEventListener('click', function (e) {
     const modal = document.getElementById('info-modal');
@@ -854,18 +1002,44 @@ async function initNpcCardPage() {
   fillNpcCard(npc, skills);
 }
 
-window.addEventListener('DOMContentLoaded', function () {
+function bindNpcPageEvents() {
+  if (npcPageInitialized) {
+    return;
+  }
+
+  npcPageInitialized = true;
+
   bindModalClose();
   bindFlipEvents();
   bindImageFitEvents();
+
+  window.addEventListener('resize', function () {
+    runNpcFitAll();
+  });
+
+  window.addEventListener('orientationchange', function () {
+    runNpcFitAll();
+  });
+
+  window.addEventListener('load', function () {
+    runNpcFitAll();
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function () {
+      runNpcFitAll();
+    });
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      runNpcFitAll();
+    });
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  bindNpcPageEvents();
   runNpcFitAll();
   initNpcCardPage();
-});
-
-window.addEventListener('resize', function () {
-  runNpcFitAll();
-});
-
-window.addEventListener('load', function () {
-  runNpcFitAll();
 });
