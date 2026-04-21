@@ -825,14 +825,14 @@ async function initNpcCardPage() {
   const npcName = getNpcParam();
 
   if (!npcName) {
-    alert('找不到 NPC 名稱');
+    alert('Roro罷工了');
     return;
   }
 
   const npc = await fetchNpcData(npcName);
 
   if (!npc) {
-    alert('找不到這個 NPC');
+    alert('Roro罷工了');
     return;
   }
 
