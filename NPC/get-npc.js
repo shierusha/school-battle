@@ -600,7 +600,7 @@ function fillNpcCard(npc, skills) {
   setTextByDataKey('other_npcs.element', mapEnumWithEmpty(npc.element, ELEMENT_MAP, '無'));
   setTextByDataKey('element_weakness.element', npc.element_weakness && npc.element_weakness.element ? mapEnum(npc.element_weakness.element, ELEMENT_MAP) : '無');
   setTextByDataKey('other_npcs.preferred_role', mapEnum(npc.preferred_role, ROLE_MAP));
-  setTextByDataKey('other_npcs.starting_position', mapEnumWithEmpty(npc.starting_position, POSITION_MAP, '可近可遠'));
+  setTextByDataKey('other_npcs.starting_position', mapEnumWithEmpty(npc.starting_position, POSITION_MAP, '無'));
 
   document.querySelectorAll('.littlename-box').forEach(box => {
     const nickElement = box.querySelector('[data-key="other_npcs.nickname"]');
