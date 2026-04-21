@@ -31,7 +31,7 @@ body.dark-bg::before {
 }
   /*翻轉區 */
     .flip-card {
-     max-width: 75vw;
+     max-width: 90vw;
       aspect-ratio: 16/9;
       margin: 25pt auto;
       overflow: hidden;   /*超出部分隱藏起來 */
