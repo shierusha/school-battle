@@ -716,7 +716,7 @@ function setInfoBoxFontSize() {
   }
 
   const minHeight = Math.min(...heights);
-  const fontSize = minHeight * 0.62;
+  const fontSize = minHeight * 0.65;
 
   boxes.forEach(box => {
     box.style.fontSize = fontSize + 'px';
