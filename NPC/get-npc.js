@@ -5,6 +5,10 @@ const DEFAULT_NPC_BACKGROUND_URL = 'https://shierusha.github.io/school-battle/te
 const DEFAULT_NPC_NAMEBOX_COLOR = '#3da2ad';
 const NPC_NAMEBOX_ALPHA = 0.8;
 
+const HIDDEN_STUDENT_ID_NPC_CATEGORIES = [
+  '內部測試'
+];
+
 const OCCUPATION_MAP = {
   attack: '攻擊手',
   healer: '補師',
@@ -211,6 +215,22 @@ function mapAppliedTo(value) {
 function setTextByDataKey(dataKey, value) {
   document.querySelectorAll(`[data-key="${dataKey}"]`).forEach(el => {
     el.textContent = value ?? '';
+  });
+}
+
+function setNpcCategoryStudentId(npcCategory) {
+  const category = String(npcCategory || '').trim();
+  const shouldHide = HIDDEN_STUDENT_ID_NPC_CATEGORIES.includes(category);
+
+  document.querySelectorAll('.student-id[data-key="other_npcs.npc_category"]').forEach(el => {
+    if (shouldHide) {
+      el.textContent = '';
+      el.style.display = 'none';
+      return;
+    }
+
+    el.textContent = category;
+    el.style.display = '';
   });
 }
 
@@ -584,7 +604,7 @@ function fillNpcCard(npc, skills) {
 
   fillNpcImages(npc);
 
-  setTextByDataKey('other_npcs.npc_category', npc.npc_category || '');
+  setNpcCategoryStudentId(npc.npc_category);
   setTextByDataKey('other_npcs.name', npc.name || '');
   setTextByDataKey('other_npcs.alignment', mapEnumWithEmpty(npc.alignment, ALIGNMENT_MAP, '?'));
   setTextByDataKey('other_npcs.race', npc.race || '');
