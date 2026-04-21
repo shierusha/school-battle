@@ -649,7 +649,14 @@ function fillNpcCard(npc, skills) {
   fillNpcSkillSlot(2, skills[1] || null);
   fillNpcExtraSkills(skills);
   bindImageFitEvents();
-  runNpcFitAll();
+
+  if (typeof fitAll === 'function') {
+    fitAll();
+  }
+
+  if (typeof checkLongTextByCharCount === 'function') {
+    checkLongTextByCharCount(11);
+  }
 }
 
 function setNameFontSize(selector, maxChars) {
@@ -657,10 +664,7 @@ function setNameFontSize(selector, maxChars) {
     const nameDiv = box.querySelector('.name-box');
     if (!nameDiv) return;
 
-    const rect = box.getBoundingClientRect();
-    if (!rect.height) return;
-
-    const fontSize = rect.height / maxChars * 0.98;
+    const fontSize = box.offsetHeight / maxChars * 0.98;
     nameDiv.style.fontSize = fontSize + 'px';
   });
 }
@@ -671,29 +675,32 @@ function fitAllNameBoxes() {
 }
 
 function setInfoBoxFontSize() {
-  const boxes = Array.from(document.querySelectorAll('.info-box'));
-  const heights = boxes
-    .map(box => box.getBoundingClientRect().height)
-    .filter(height => height > 0);
+  const infoBoxes = document.querySelectorAll('.info-box');
 
-  if (heights.length === 0) {
+  if (!infoBoxes.length) {
     return;
   }
 
-  const minHeight = Math.min(...heights);
+  let minHeight = Infinity;
+
+  infoBoxes.forEach(box => {
+    const height = box.offsetHeight;
+
+    if (height < minHeight) {
+      minHeight = height;
+    }
+  });
+
   const fontSize = minHeight * 0.62;
 
-  boxes.forEach(box => {
+  infoBoxes.forEach(box => {
     box.style.fontSize = fontSize + 'px';
   });
 }
 
 function setStudentIdFontSize() {
   document.querySelectorAll('.student-id').forEach(box => {
-    const rect = box.getBoundingClientRect();
-    if (!rect.height) return;
-
-    const fontSize = rect.height * 0.7;
+    const fontSize = box.offsetHeight * 0.7;
     box.style.fontSize = fontSize + 'px';
   });
 }
@@ -705,33 +712,13 @@ function fitAll() {
 }
 
 function runNpcFitAll() {
-  fitAll();
-  checkLongTextByCharCount(11);
-
-  requestAnimationFrame(() => {
+  if (typeof fitAll === 'function') {
     fitAll();
-    checkLongTextByCharCount(11);
+  }
 
-    requestAnimationFrame(() => {
-      fitAll();
-      checkLongTextByCharCount(11);
-    });
-  });
-
-  setTimeout(() => {
-    fitAll();
+  if (typeof checkLongTextByCharCount === 'function') {
     checkLongTextByCharCount(11);
-  }, 120);
-
-  setTimeout(() => {
-    fitAll();
-    checkLongTextByCharCount(11);
-  }, 360);
-
-  setTimeout(() => {
-    fitAll();
-    checkLongTextByCharCount(11);
-  }, 720);
+  }
 }
 
 function bindImageFitEvents() {
@@ -857,22 +844,6 @@ window.addEventListener('resize', function () {
   runNpcFitAll();
 });
 
-window.addEventListener('orientationchange', function () {
-  runNpcFitAll();
-});
-
 window.addEventListener('load', function () {
   runNpcFitAll();
 });
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', function () {
-    runNpcFitAll();
-  });
-}
-
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(function () {
-    runNpcFitAll();
-  });
-}
